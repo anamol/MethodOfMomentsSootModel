@@ -16,10 +16,13 @@ This code can currently only be used for turbulent non-premixed flames with the
 flamelet model. This file contains:
 1. Source term UDF's for each moment.
     Moment-0 : nucleation, coagulation
-    Moment-1 : nucleation, HACA surface growth, oxidation via O2 and OH
-    Moment-2 : nucleation, coagulation, HACA surface growth, oxidation via O2 and OH
+    Moment-1 : nucleation, surface growth via HACA and PAH condensation, oxidation via O2 and OH
+    Moment-2 : nucleation, coagulation, surface growth via HACA and PAH condensation, oxidation via O2 and OH
 
 2. UDF for calculating effective turbulent diffusivity. 
+
+3. UDF's for calculating the absorption coefficient of sooty gas, taken from Widmann (2003)
+    and Sazhin (1994). 
  
 
 RUNNING THE CODE FOR STEADY STATE SOLUTION:
@@ -37,6 +40,8 @@ RUNNING THE CODE FOR STEADY STATE SOLUTION:
 
 
 USER DEFINED MEMORY ALLOCATION
+
+Source terms:
 UDM 0 : Nucleation source term for zeroth moment  
 UDM 1 : Nucleation source term for first moment
 UDM 2 : Nucleation source term for second moment 
@@ -44,8 +49,24 @@ UDM 3 : C2H2 surface growth term for first moment
 UDM 4 : C2H2 surface growth term for second moment
 UDM 5 : O2 oxidation term for first moment
 UDM 6 : OH oxidation term for first moment
-UDM 7 : O2 oxidation term for second moment
-UDM 8 : OH oxidation term for second moment
+UDM 7 : Total oxidation term for first moment
+UDM 8 : O2 oxidation term for second moment
+UDM 9 : OH oxidation term for second moment
+UDM 10: Total oxidation term for second moment
+UDM 11: PAH surface growth source term for first moment
+UDM 12: PAH surface growth source term for second moment
+UDM 13: Continuum coagulation source term for zeroth moment
+UDM 14: Free molecular coagulation source term for zeroth moment
+UDM 15: Actual coagulation source term for zeroth moment 
+UDM 16: Continuum coagulation source term for second moment
+UDM 17: Free molecular coagulation source term for second moment
+UDM 18: Actual coagulation source term for second moment 
+
+Others:
+UDM 19: alpha (fraction of surface sites available for reaction)
+UDM 20: Mean free path of gas
+UDM 21: Average diameter of soot particle
+UDM 22: Knudsen number
 */
 
 
@@ -73,23 +94,28 @@ UDM 8 : OH oxidation term for second moment
 #define H2OMW 16 
 #define pyrMW 202.25 
 #define benzeneMW 78.11
+#define naphMW 128.17
+#define phenanMW 178.234
 
 /* masses and diameters of atoms */
 #define mC 1.9944e-26 /* kg/atom */
 #define mOH 2.8232e-26 /* kg/atom */
 #define dAir 3.6e-10 /* m */
 #define dC 2.2e-10 /* m */
+#define dA 1.395*sqrt(3)
 #define dPyr 2.5*1.395e-10*sqrt(3) /* m */
 #define dBenzene 1.395e-10 /* m */
 
 /* number of C atoms in species */
 #define NPyr 16
 #define NBenzene 6
+#define NPhenan 14
+#define NNaph 10
 
 /* MOMIC parameters */
-#define gammaPyr 0.025
+#define gammaPyr 0.001
 #define gammaBenzene 0.001
-#define vDW 2.2
+#define vDW 4.0
 #define siteDensity 2.3e19 /* m^2 */
 #define rhoSoot 1800 /* kg/m^3 */
 #define normParameter 1e15
@@ -118,7 +144,7 @@ UDM 8 : OH oxidation term for second moment
 #define gammaOH 0.13
 
 /* Fudge Factors */
-#define fudgeFac1 1.0
+#define fudgeFac1 0.4
 
 real lagInterp3mom(real p, real m0, real m1, real m2); /* Lagragian interpolation */
 real logInterp(real p, real a, real b, real M, real N); /* logarithmic interpolation */
@@ -130,28 +156,36 @@ DEFINE_SOURCE (m_0_NucSource,c,t,dS,eqn)
 {
 
     /* Source for pyrene nucleation */
-    real sourcePyr = pyrNucSource(c,t);
+    real sourcePyr = pyrNucSource(c,t); 
+    real source = sourcePyr; 
     /* Pyrene nucleation source calculation ends */
 
-    /* Source for benzene nucleation */
-    /*real sourceBenz = benzSource(c,t); */
-    /* Benzene nucleation source ends */
+    /* Source for benzene nucleation 
+    real sourceBenz = benzNucSource(c,t); 
+    real source = sourceBenz;
+    Benzene nucleation source ends */
 
     dS[eqn] = 0.0;
-    C_UDMI(c,t,0) = sourcePyr;
-    return sourcePyr;
+    C_UDMI(c,t,0) = source;
+    return source;
 }
 
 DEFINE_SOURCE (m_1_NucSource,c,t,dS,eqn)
 {
 
     /* Source for pyrene nucleation */
-    real sourcePyr = (2*NPyr)*pyrNucSource(c,t);
+    real sourcePyr = (2*NPyr)*pyrNucSource(c,t); 
+    real source = sourcePyr; 
     /* Pyrene nucleation source calculation ends */
 
+    /* Source for benzene nucleation 
+    real sourceBenz = (2*NBenzene)*benzNucSource(c,t); 
+    real source = sourceBenz;
+    Benzene nucleation source ends */
+
     dS[eqn] = 0.0;
-    C_UDMI(c,t,1) = sourcePyr;
-    return sourcePyr;
+    C_UDMI(c,t,1) = source;
+    return source;
 }
 
 DEFINE_SOURCE (m_2_NucSource,c,t,dS,eqn)
@@ -159,11 +193,17 @@ DEFINE_SOURCE (m_2_NucSource,c,t,dS,eqn)
 
     /* Source for pyrene nucleation */
     real sourcePyr = (2*NPyr)*(2*NPyr)*pyrNucSource(c,t);
+    real source = sourcePyr; 
     /* Pyrene nucleation source calculation ends */
 
+    /* Source for benzene nucleation 
+    real sourceBenz = (2*NBenzene)*(2*NBenzene)*benzNucSource(c,t); 
+    real source = sourceBenz;
+    Benzene nucleation source ends */
+
     dS[eqn] = 0.0;
-    C_UDMI(c,t,2) = sourcePyr;
-    return sourcePyr;
+    C_UDMI(c,t,2) = source;
+    return source;
 }
 
 DEFINE_SOURCE (m_1_C2H2Source,c,t,dS,eqn)
@@ -179,25 +219,26 @@ DEFINE_SOURCE (m_1_C2H2Source,c,t,dS,eqn)
     real alpha = tanh(a/log10(cellM1/cellM0)+b); 
     if (alpha < 0 ) { alpha = 0.01; }
 
-    C_UDMI(c,t,18) = alpha;
+    C_UDMI(c,t,19) = alpha;
 
-    Material *mat = THREAD_MATERIAL(t);
+    Material *mat1 = THREAD_MATERIAL(t);
 
-    int idC2H2 = mixture_specie_index(mat, "c2h2");
+    int idC2H2 = mixture_specie_index(mat1, "c2h2");
     real C2H2Mf = Pdf_Yi(c,t,idC2H2);
     real C2H2Mc = C2H2Mf*cellRho/C2H2MW;
+
     
     real k4 = A4*pow(cellTemp, n4)*exp(-Ea4/(R*cellTemp));
-    real chiSoot = chiSootCalc(c,t,cellTemp,cellRho);
+    real chiSoot = chiSootCalc(c,t,cellTemp,cellRho); 
     real Cs = pow((6*mC/(pi*rhoSoot)),oneThird);
-    real muTwoThird = pow(10, lagInterp3mom(twoThird, log10(cellM0/cellM0), log10(cellM1/cellM0), log10(cellM2/cellM0)));
-    /*real MtwoThird = cellM0*pow(10, lagInterp3mom(twoThird, log10(cellM0/cellM0), log10(cellM1/cellM0), log10(cellM2/cellM0))); */
+
+    real muTwoThird = pow(10, lagInterp3mom(twoThird, 0.0, log10(cellM1/cellM0), log10(cellM2/cellM0))); 
 
     source = 2*k4*C2H2Mc*alpha*chiSoot*pi*pow(Cs,2)*muTwoThird*cellM0;
+    dS[eqn] = 2*k4*C2H2Mc*alpha*chiSoot*pi*pow(Cs,2)*pow(cellM0,twoThird/3)*pow(cellM2,-oneThird/3)*pow(cellM1,-oneThird/3)*8.0/9.0;
 
     C_UDMI(c,t,3) = source;
 
-    dS[eqn] = 0.0;
     return source;
 }
 
@@ -229,9 +270,11 @@ DEFINE_SOURCE (m_2_C2H2Source,c,t,dS,eqn)
 
     source = k4*C2H2Mc*alpha*chiSoot*pi*pow(Cs,2)*(4*MtwoThird + 4*MfiveThird);
 
+    dS[eqn] = k4*C2H2Mc*alpha*chiSoot*pi*pow(Cs,2)*(-4*pow(cellM0,twoThird/3)*pow(cellM2,-11*oneThird/3)*\
+        pow(cellM1,-8*oneThird/3)/9.0+4*5.0/9.0*pow(cellM0,-oneThird/3)*pow(cellM2,-4*oneThird/3)*pow(cellM1,5*oneThird/3));
+
     C_UDMI(c,t,4) = source;
 
-    dS[eqn] = 0.0;
     return source;
 }
 
@@ -274,7 +317,9 @@ DEFINE_SOURCE(m_1_OxSource,c,t,dS,eqn)
     C_UDMI(c,t,5) = sourceO2;
     C_UDMI(c,t,6) = sourceOH;
 
-    dS[eqn] = 0.0;
+    C_UDMI(c,t,7) = source*fudgeFac1;
+
+    dS[eqn] = -2*k5*O2Mc*alpha*chiSoot*pi*pow(Cs,2)*pow(cellM0,twoThird/3)*pow(cellM2,-oneThird/3)*pow(cellM1,-oneThird/3)*8.0/9.0;
     return source*fudgeFac1;
 }
 
@@ -315,13 +360,111 @@ DEFINE_SOURCE(m_2_OxSource,c,t,dS,eqn)
     sourceOH = gammaOH*OHMc*sqrt(pi*kB*cellTemp/(2*mOH))*pi*pow(Cs,2)*(4*MtwoThird - 4*MfiveThird);
     source = sourceO2 + sourceOH;
 
-    C_UDMI(c,t,7) = sourceO2;
-    C_UDMI(c,t,8) = sourceOH;
+    C_UDMI(c,t,8) = sourceO2;
+    C_UDMI(c,t,9) = sourceOH;
 
-    dS[eqn] = 0.0;
-    C_UDMI(c,t,17) = source*fudgeFac1;
+    dS[eqn] = k5*O2Mc*alpha*chiSoot*pi*pow(Cs,2)*(-4*pow(cellM0,twoThird/3)*pow(cellM2,-11*oneThird/3)*\
+        pow(cellM1,-8*oneThird/3)/9.0+4*5.0/9.0*pow(cellM0,-oneThird/3)*pow(cellM2,-4*oneThird/3)*pow(cellM1,5*oneThird/3));
+
+
+    C_UDMI(c,t,10) = source*fudgeFac1;
     return source*fudgeFac1;
 }
+
+DEFINE_SOURCE (m_1_PAHsource,c,t,dS,eqn)
+{
+    real source;
+    real cellRho = C_R(c,t);
+    real cellTemp = C_T(c,t);
+    real cellM0 = cellRho*C_UDSI(c,t,0);
+    real cellM1 = cellRho*C_UDSI(c,t,1);
+    real cellM2 = cellRho*C_UDSI(c,t,2);
+
+    Material *mat = THREAD_MATERIAL(t);
+
+    int ida2 = mixture_specie_index(mat,"a2");
+    int ida3 = mixture_specie_index(mat,"a3");
+    int ida4 = mixture_specie_index(mat,"a4");
+
+    real a2Mf = Pdf_Yi(c,t,ida2);
+    real a3Mf = Pdf_Yi(c,t,ida3);
+    real a4Mf = Pdf_Yi(c,t,ida4);
+
+    real PAHM0 = cellRho*avogad*(a2Mf/naphMW + a3Mf/phenanMW + a4Mf/pyrMW)/normParameter;
+    real PAHM1 = cellRho*avogad*(a2Mf/naphMW*NNaph + a3Mf/phenanMW*NPhenan + a4Mf/pyrMW*NPyr)/normParameter;
+    real PAHM2 = cellRho*avogad*(a2Mf/naphMW*pow(NNaph,2) + a3Mf/phenanMW*pow(NPhenan,2) + a4Mf/pyrMW*pow(NPyr,2))/normParameter;
+
+    C_UDMI(c,t,23) = PAHM0;
+    C_UDMI(c,t,24) = PAHM1;
+    C_UDMI(c,t,25) = PAHM2;
+
+    real MoneThird = cellM0*pow(10, lagInterp3mom(oneThird, log10(cellM0/cellM0), log10(cellM1/cellM0), log10(cellM2/cellM0)));
+    real MtwoThird = cellM0*pow(10, lagInterp3mom(twoThird, log10(cellM0/cellM0), log10(cellM1/cellM0), log10(cellM2/cellM0)));
+    real MPAHthreeHalf = PAHM0*pow(10, lagInterp3mom(3*oneHalf, log10(PAHM0/PAHM0), log10(PAHM1/PAHM0), log10(PAHM2/PAHM0)));
+    real MPAHoneHalf = PAHM0*pow(10, lagInterp3mom(oneHalf, log10(PAHM0/PAHM0), log10(PAHM1/PAHM0), log10(PAHM2/PAHM0)));
+
+    C_UDMI(c,t,26) = MPAHoneHalf;
+    C_UDMI(c,t,27) = MPAHthreeHalf;
+
+    real Ch = dA*sqrt(twoThird);
+    real Cs = pow((6*mC/(pi*rhoSoot)),oneThird);
+
+    source = vDW*sqrt(pi*kB*cellTemp/(2*mC))*(pow(Ch,2)*MPAHthreeHalf*cellM0 + 2*Ch*Cs*PAHM1*MoneThird + pow(Cs,2)*MPAHoneHalf*MtwoThird);
+
+    dS[eqn] = vDW*sqrt(pi*kB*cellTemp/(2*mC))*(2*Ch*Cs*PAHM1*5.0/9.0*pow(cellM0,5.0/9.0)*pow(cellM1,-4.0/9.0)*pow(cellM2,-1.0/9.0) +\
+        pow(Cs,2)*MPAHoneHalf*2.0/9.0*pow(cellM0,8.0/9.0)*pow(cellM1,-7.0/9.0)*pow(cellM2,-1.0/9.0));
+
+    C_UDMI(c,t,11) = source;
+    return source;
+}
+
+DEFINE_SOURCE (m_2_PAHsource,c,t,dS,eqn)
+{
+    real source;
+    real cellRho = C_R(c,t);
+    real cellTemp = C_T(c,t);
+    real cellM0 = cellRho*C_UDSI(c,t,0);
+    real cellM1 = cellRho*C_UDSI(c,t,1);
+    real cellM2 = cellRho*C_UDSI(c,t,2);
+
+    Material *mat = THREAD_MATERIAL(t);
+
+    int ida2 = mixture_specie_index(mat,"a2");
+    int ida3 = mixture_specie_index(mat,"a3");
+    int ida4 = mixture_specie_index(mat,"a4");
+
+    real a2Mf = Pdf_Yi(c,t,ida2);
+    real a3Mf = Pdf_Yi(c,t,ida3);
+    real a4Mf = Pdf_Yi(c,t,ida4);
+
+    real PAHM0 = cellRho*avogad*(a2Mf/naphMW + a3Mf/phenanMW + a4Mf/pyrMW)/normParameter;
+    real PAHM1 = cellRho*avogad*(a2Mf/naphMW*NNaph + a3Mf/phenanMW*NPhenan + a4Mf/pyrMW*NPyr)/normParameter;
+    real PAHM2 = cellRho*avogad*(a2Mf/naphMW*pow(NNaph,2) + a3Mf/phenanMW*pow(NPhenan,2) + a4Mf/pyrMW*pow(NPyr,2))/normParameter;
+
+    real MoneThird = cellM0*pow(10, lagInterp3mom(oneThird, log10(cellM0/cellM0), log10(cellM1/cellM0), log10(cellM2/cellM0)));
+    real MtwoThird = cellM0*pow(10, lagInterp3mom(twoThird, log10(cellM0/cellM0), log10(cellM1/cellM0), log10(cellM2/cellM0)));
+    real MfourThird = cellM0*pow(10, lagInterp3mom(2*twoThird, log10(cellM0/cellM0), log10(cellM1/cellM0), log10(cellM2/cellM0)));
+    real MfiveThird = cellM0*pow(10, lagInterp3mom(5*oneThird, log10(cellM0/cellM0), log10(cellM1/cellM0), log10(cellM2/cellM0)));
+
+    real MPAHthreeHalf = PAHM0*pow(10, lagInterp3mom(3*oneHalf, log10(PAHM0/PAHM0), log10(PAHM1/PAHM0), log10(PAHM2/PAHM0)));
+    real MPAHfiveHalf = PAHM0*pow(10, lagInterp3mom(5*oneHalf, log10(PAHM0/PAHM0), log10(PAHM1/PAHM0), log10(PAHM2/PAHM0)));
+    real MPAHoneHalf = PAHM0*pow(10, lagInterp3mom(oneHalf, log10(PAHM0/PAHM0), log10(PAHM1/PAHM0), log10(PAHM2/PAHM0)));
+
+    real Ch = dA*sqrt(twoThird);
+    real Cs = pow((6*mC/(pi*rhoSoot)),oneThird);
+
+    source = vDW*sqrt(pi*kB*cellTemp/(2*mC))*(pow(Ch,2)*MPAHfiveHalf*cellM0 + 2*Ch*Cs*PAHM2*MoneThird + pow(Cs,2)*MPAHthreeHalf*MtwoThird +\
+        2*(pow(Ch,2)*MPAHthreeHalf*cellM1 + 2*Ch*Cs*PAHM1*MfourThird + pow(Cs,2)*MPAHoneHalf*MfiveThird));
+
+    dS[eqn] = vDW*sqrt(pi*kB*cellTemp/(2*mC))*(-2*Ch*Cs*PAHM2*1.0/9.0*pow(cellM0,5.0/9.0)*pow(cellM1,5.0/9.0)*pow(cellM2,-10.0/9.0) - \
+        pow(Cs,2)*MPAHthreeHalf*1.0/9.0*pow(cellM0,8.0/9.0)*pow(cellM1,2.0/9.0)*pow(cellM2,-10.0/9.0) + \
+        2*(2*Ch*Cs*PAHM1*2.0/9.0*pow(cellM0,-1.0/9.0)*pow(cellM1,8.0/9.0)*pow(cellM2,-4.0/9.0)) + \
+        pow(Cs,2)*MPAHoneHalf*5.0/9.0*pow(cellM0,-1.0/9.0)*pow(cellM1,5.0/9.0)*pow(cellM2,-4.0/9.0));
+
+    C_UDMI(c,t,12) = source;
+    return source;
+}
+
 
 DEFINE_SOURCE (m_0_CoagSource,c,t,dS,eqn)
 {
@@ -337,21 +480,16 @@ DEFINE_SOURCE (m_0_CoagSource,c,t,dS,eqn)
     real muOneThird = pow(10, lagInterp3mom(oneThird, log10(cellM0/cellM0), log10(cellM1/cellM0), log10(cellM2/cellM0)));
 
     real meanFreePath = kB*cellTemp/(sqrt(2)*pi*pow(dAir,2)*cellPressure);
-    real avgDia = pow(6*mC/(pi*rhoSoot),oneThird)*muOneThird;
-    /*real avgDia = pow(10, lagInterp3mom(oneThird, log10(cellM0/cellM0), log10(cellM1/cellM0), log10(cellM2/cellM0)))*dC; */
-    C_UDMI(c,t,9) = avgDia;
+    real avgDia = pow(10, lagInterp3mom(oneThird, log10(cellM0/cellM0), log10(cellM1/cellM0), log10(cellM2/cellM0)))*dC; 
     real Kn = 2*meanFreePath/avgDia;
-    C_UDMI(c,t,10) = Kn;
+
+    C_UDMI(c,t,20) = meanFreePath; 
+    C_UDMI(c,t,21) = avgDia;
+    C_UDMI(c,t,22) = Kn;
+
     real Kc = 2*kB*cellTemp/(3*lamVisc);
     real KcPrime = 2.514*meanFreePath*pow(pi*rhoSoot/6,oneThird);
     real Kf = vDW*sqrt(6*kB*cellTemp/rhoSoot)*pow(3*mC/(4*pi*rhoSoot),oneSixth);
-
-    C_UDMI(c,t,26) = meanFreePath; 
-
-    /* real muOneThird = logInterp(oneThird, 0.0, 1.0, (cellM0/cellM0), (cellM1/cellM0));
-    real muTwoThird = logInterp(twoThird, 0.0, 1.0, (cellM0/cellM0), (cellM1/cellM0));
-    real muFourThird = logInterp(2*twoThird, 1.0, 2.0, (cellM1/cellM0), (cellM2/cellM0));
-    real muFiveThird = logInterp(5*oneThird, 1.0, 2.0, (cellM1/cellM0), (cellM2/cellM0)); */
     
     real muTwoThird = pow(10, lagInterp3mom(twoThird, log10(cellM0/cellM0), log10(cellM1/cellM0), log10(cellM2/cellM0)));
     real muFourThird = pow(10, lagInterp3mom(4*oneThird, log10(cellM0/cellM0), log10(cellM1/cellM0), log10(cellM2/cellM0)));
@@ -378,32 +516,14 @@ DEFINE_SOURCE (m_0_CoagSource,c,t,dS,eqn)
     real f_1_0_0 = 2*(muMinusOneHalf*muSevenSixth + 2*muMinusOneSixth*muFiveSixth + muOneSixth*muOneHalf);
     real f_2_0_0 = 2*(muMinusOneHalf*muThirteenSixth + 2*muMinusOneSixth*muElevenSixth + muOneSixth*muThreeHalf + 2*muOneHalf*muSevenSixth + 2*pow(muFiveSixth,2));
 
-    /*real f_0_0_0 = 2*muTwoThird + 2*muOneThird*muOneThird;
-    real f_1_0_0 = 2*muFiveThird + 2*muTwoThird*cellM1/cellM0 + 4*muFourThird*muOneThird;
-    real f_2_0_0 = 2*muEightThird + 2*muTwoThird*cellM2/cellM0 + 4*muFiveThird*cellM1/cellM0 + 4*muSevenThird*muOneThird + 4*pow(muFourThird,2); */
     real f_oneHalf_0_0 = pow(10, lagInterp3mom(oneHalf, log10(f_0_0_0), log10(f_1_0_0), log10(f_2_0_0)));
 
     real Gc = -Kc*(1 + muOneThird*muMinusOneThird + KcPrime*(muMinusOneThird + muOneThird*muMinusTwoThird))*pow(cellM0,2)*normParameter;
-
     real Gf = -0.5*Kf*pow(cellM0,2)*f_oneHalf_0_0*normParameter;
 
     
-    C_UDMI(c,t,27) = f_oneHalf_0_0;
-    C_UDMI(c,t,28) = f_0_0_0;
-    C_UDMI(c,t,29) = f_1_0_0;
-    C_UDMI(c,t,30) = f_2_0_0;
-
-
-    C_UDMI(c,t,19) = muTwoThird;
-    C_UDMI(c,t,20) = muFourThird;
-    C_UDMI(c,t,21) = muFiveThird;
-    C_UDMI(c,t,22) = muSevenThird;
-    C_UDMI(c,t,23) = muEightThird;
-    C_UDMI(c,t,24) = muMinusOneThird;
-    C_UDMI(c,t,25) = muMinusTwoThird;
-
-    C_UDMI(c,t,11) = Gc;
-    C_UDMI(c,t,12) = Gf;
+    C_UDMI(c,t,13) = Gc;
+    C_UDMI(c,t,14) = Gf;
 
 
     if (Kn < 0.1) { source = Gc; }
@@ -414,7 +534,7 @@ DEFINE_SOURCE (m_0_CoagSource,c,t,dS,eqn)
 
     dS[eqn] = 0.0;
 
-    C_UDMI(c,t,13) = source;
+    C_UDMI(c,t,15) = source;
     return source;
 
 }
@@ -434,30 +554,17 @@ DEFINE_SOURCE (m_2_CoagSource,c,t,dS,eqn)
     real muOneThird = pow(10, lagInterp3mom(oneThird, log10(cellM0/cellM0), log10(cellM1/cellM0), log10(cellM2/cellM0)));
 
     real meanFreePath = kB*cellTemp/(sqrt(2)*pi*pow(dAir,2)*cellPressure);
-    real avgDia = pow(6*mC/(pi*rhoSoot),oneThird)*muOneThird;
-    /*real avgDia = logInterp(oneThird, 0.0, 1.0, cellM0, cellM1)/cellM0*dC; */
+    real avgDia = pow(10, lagInterp3mom(oneThird, log10(cellM0/cellM0), log10(cellM1/cellM0), log10(cellM2/cellM0)))*dC;
     real Kn = 2*meanFreePath/avgDia;
     real Kc = 2*kB*cellTemp/(3*lamVisc);
     real KcPrime = 2.514*meanFreePath*pow(pi*rhoSoot/6,oneThird);
     real Kf = vDW*sqrt(6*kB*cellTemp/rhoSoot)*pow(3*mC/(4*pi*rhoSoot),oneSixth);
-
-    /*real muOneThird = logInterp(oneThird, 0.0, 1.0, (cellM0/cellM0), (cellM1/cellM0));
-    real muTwoThird = logInterp(twoThird, 0.0, 1.0, (cellM0/cellM0), (cellM1/cellM0));
-    real muFourThird = logInterp(2*twoThird, 1.0, 2.0, (cellM1/cellM0), (cellM2/cellM0));
-    real muFiveThird = logInterp(5*oneThird, 1.0, 2.0, (cellM1/cellM0), (cellM2/cellM0)); */
-
     
     real muTwoThird = pow(10, lagInterp3mom(twoThird, log10(cellM0/cellM0), log10(cellM1/cellM0), log10(cellM2/cellM0)));
     real muFourThird = pow(10, lagInterp3mom(4*oneThird, log10(cellM0/cellM0), log10(cellM1/cellM0), log10(cellM2/cellM0)));
     real muFiveThird = pow(10, lagInterp3mom(5*oneThird, log10(cellM0/cellM0), log10(cellM1/cellM0), log10(cellM2/cellM0)));
-
     real muSevenThird = pow(10, lagInterp3mom(7*oneThird, log10(cellM0/cellM0), log10(cellM1/cellM0), log10(cellM2/cellM0)));
     real muEightThird = pow(10, lagInterp3mom(8*oneThird, log10(cellM0/cellM0), log10(cellM1/cellM0), log10(cellM2/cellM0)));
-
-    /*real f_0_1_1 = 2*muFiveThird*cellM1/cellM0 + 2*muFourThird*muFourThird;
-    real f_1_1_1 = 2*muEightThird*cellM1/cellM0 + 2*muTwoThird*cellM1/cellM0 + 4*muSevenThird*muFourThird;
-    real f_oneHalf_1_1 = logInterp(oneHalf,0.0,1.0,f_0_1_1,f_1_1_1);*/
-
     real muMinusOneHalf = pow(10, lagInterp3mom(-oneHalf, log10(cellM0/cellM0), log10(cellM1/cellM0), log10(cellM2/cellM0)));
     real muMinusOneSixth = pow(10, lagInterp3mom(-oneSixth, log10(cellM0/cellM0), log10(cellM1/cellM0), log10(cellM2/cellM0)));
     real muOneSixth = pow(10, lagInterp3mom(oneSixth, log10(cellM0/cellM0), log10(cellM1/cellM0), log10(cellM2/cellM0)));
@@ -480,8 +587,8 @@ DEFINE_SOURCE (m_2_CoagSource,c,t,dS,eqn)
 
     real Gf = Kf*pow(cellM0,2)*f_oneHalf_1_1*normParameter;
 
-    C_UDMI(c,t,14) = Gc;
-    C_UDMI(c,t,15) = Gf;
+    C_UDMI(c,t,16) = Gc;
+    C_UDMI(c,t,17) = Gf;
 
     if (Kn < 0.1) { source = Gc; }
 
@@ -491,7 +598,7 @@ DEFINE_SOURCE (m_2_CoagSource,c,t,dS,eqn)
 
     dS[eqn] = 0.0;
     
-    C_UDMI(c,t,16) = source;
+    C_UDMI(c,t,18) = source;
 
     return source;
 }
@@ -560,16 +667,28 @@ real chiSootCalc(cell_t c,Thread *t, real cellTemp, real cellRho)
     real O2Mc = O2Mf*cellRho/O2MW;
     real OHMc = OHMf*cellRho/OHMW;
     real H2OMc = H2OMf*cellRho/H2OMW;
+
+    C_UDMI(c,t,24) = C2H2Mc;
+    C_UDMI(c,t,25) = H2Mc;
+    C_UDMI(c,t,26) = HMc;
+    C_UDMI(c,t,27) = O2Mc;
+    C_UDMI(c,t,28) = OHMc;
+    C_UDMI(c,t,29) = H2OMc;
     
 
     real k1f = A1f*exp(-Ea1f/(R*cellTemp));
     real k1r = A1r*exp(-Ea1r/(R*cellTemp));
     real k2f = A2f*pow(cellTemp, n2f)*exp(-Ea2f/(R*cellTemp));
     real k2r = A2r*pow(cellTemp, n2r)*exp(-Ea2r/(R*cellTemp));
-    real k3 = A3;
+    real k3 = A3; 
     real k4 = A4*pow(cellTemp, n4)*exp(-Ea4/(R*cellTemp));
     real k5 = A5*exp(-Ea5/(R*cellTemp));
-    real chiSoot = (k1f*HMc + k2f*OHMc)/(k1r*H2Mc + k2r*H2OMc + k3*HMc + k4*C2H2Mc + k5*O2Mc) * siteDensity;
+
+    real numerator = k1f*HMc + k2f*OHMc;
+    real denominator = k1r*H2Mc + k2r*H2OMc + k3*HMc + k4*C2H2Mc + k5*O2Mc;
+
+    real chiSoot = numerator/(denominator + 1.0) * siteDensity;
+
     return chiSoot;
 }
 
@@ -580,24 +699,37 @@ DEFINE_DIFFUSIVITY(uds_diff,c,t,i)
     return diff;
 }
 
-DEFINE_PROPERTY(abd_coeff_Widmann,c,t,i)
+DEFINE_PROPERTY(abs_coeff_Widmann,c,t)
 {
     real cellTemp = C_T(c,t);
     real cellRho = C_R(c,t);
     real cellM1 = C_UDSI(c,t,1);
-    real sootfv = cellM1*mC*cellRho/rhoSoot;
+    real sootfv = cellM1*mC*cellRho/rhoSoot*normParameter;
 
     real absCoeff = 2370*cellTemp*sootfv;
-    return absCoeff
+    return absCoeff;
 }
 
-DEFINE_PROPERTY(abd_coeff_Sazhin,c,t,i)
+DEFINE_PROPERTY(abs_coeff_Sazhin,c,t)
 {
     real cellTemp = C_T(c,t);
     real cellRho = C_R(c,t);
     real cellM1 = C_UDSI(c,t,1);
-    real sootfv = cellM1*mC*cellRho/rhoSoot;
+    real sootfv = cellM1*mC*cellRho/rhoSoot*normParameter;
 
     real absCoeff = 1232.4*rhoSoot*sootfv*(1+4.8e-4*(cellTemp-2000));
-    return absCoeff
+    return absCoeff;
+}
+
+DEFINE_PROPERTY(thermal_conductivity,c,t)
+{
+    real cellTemp = C_T(c,t);
+    real Tr = cellTemp/132.52;
+
+
+    real thermCond = 4.358e-3*(33.972*pow(Tr,-1) - 164.702*pow(Tr,-twoThird) + 262.108*pow(Tr,-oneThird) 
+        - 21.534 - 443.455*pow(Tr,oneThird) + 607.339*pow(Tr, twoThird) - 368.79*Tr + 111.296*pow(Tr, 2*twoThird) 
+        - 13.412*pow(Tr, 5*oneThird));
+
+    return thermCond;
 }
