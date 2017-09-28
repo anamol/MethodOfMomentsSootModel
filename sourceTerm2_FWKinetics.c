@@ -180,6 +180,7 @@ DEFINE_SOURCE (m_1_NucSourcePyr,c,t,dS,eqn)
     dS[eqn] = 0.0;
     C_UDMI(c,t,1) = source;
     return source;
+}
 
 DEFINE_SOURCE (m_1_NucSourceBenz,c,t,dS,eqn)
 {
@@ -707,6 +708,7 @@ real chiSootCalc(cell_t c,Thread *t, real cellTemp, real cellRho)
     real k1f = A1f*exp(-Ea1f/(R*cellTemp));
     real k1r = A1r*exp(-Ea1r/(R*cellTemp));
     real k2 = A2; 
+    real k3 = A3*pow(cellTemp, n3)*exp(-Ea3/(R*cellTemp));
     real k4 = A4*exp(-Ea4/(R*cellTemp));
 
     real numerator = k1f*HMc;
