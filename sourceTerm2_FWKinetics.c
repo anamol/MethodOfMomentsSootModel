@@ -129,7 +129,7 @@ UDM 22: Knudsen number
 #define Ea1f 66900
 #define A1r 3.9e9
 #define Ea1r 39000
-#define A2 1.0e7
+#define A2 1.0e11
 #define A3 8.4e8
 #define n3 0.4
 #define Ea3 35100
