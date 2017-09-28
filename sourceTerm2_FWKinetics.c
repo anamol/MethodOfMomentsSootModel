@@ -365,7 +365,7 @@ DEFINE_SOURCE(m_2_OxSource,c,t,dS,eqn)
     real O2Mc = O2Mf*cellRho/O2MW;
     real OHMc = OHMf*cellRho/OHMW;
 
-    real k5 = A5*exp(-Ea5/(R*cellTemp));
+    real k4 = A4*exp(-Ea4/(R*cellTemp));
     real chiSoot = chiSootCalc(c,t,cellTemp,cellRho);
     real Cs = pow((6*mC/(pi*rhoSoot)),oneThird);
 
@@ -708,7 +708,6 @@ real chiSootCalc(cell_t c,Thread *t, real cellTemp, real cellRho)
     real k1r = A1r*exp(-Ea1r/(R*cellTemp));
     real k2 = A2; 
     real k4 = A4*exp(-Ea4/(R*cellTemp));
-    real k5 = A5*exp(-Ea5/(R*cellTemp));
 
     real numerator = k1f*HMc;
     real denominator = k1r*H2Mc + k2*HMc + k3*C2H2Mc + k4*O2Mc;
