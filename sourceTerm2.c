@@ -144,7 +144,7 @@ UDM 22: Knudsen number
 #define gammaOH 0.13
 
 /* Fudge Factors */
-#define fudgeFac1 0.9
+#define fudgeFac1 1.0
 #define fudgeFac2 1.0
 
 real lagInterp3mom(real p, real m0, real m1, real m2); /* Lagragian interpolation */
