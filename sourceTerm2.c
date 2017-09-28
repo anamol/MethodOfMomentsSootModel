@@ -153,54 +153,67 @@ real pyrNucSource(cell_t c,Thread *t);
 real benzNucSource(cell_t c,Thread *t);
 real chiSootCalc(cell_t c,Thread *t, real cellTemp, real cellRho);
 
-DEFINE_SOURCE (m_0_NucSource,c,t,dS,eqn)
+DEFINE_SOURCE (m_0_NucSourcePyr,c,t,dS,eqn)
 {
 
-    /* Source for pyrene nucleation */
-    real sourcePyr = pyrNucSource(c,t); 
-    real source = sourcePyr; 
-    /* Pyrene nucleation source calculation ends */
 
-    /* Source for benzene nucleation 
-    real sourceBenz = benzNucSource(c,t); 
-    real source = sourceBenz;
-    /*Benzene nucleation source ends */
+    real sourcePyr = pyrNucSource(c,t); 
 
     dS[eqn] = 0.0;
-    C_UDMI(c,t,0) = source;
-    return source;
+    C_UDMI(c,t,0) = sourcePyr;
+    return sourcePyr;
 }
 
-DEFINE_SOURCE (m_1_NucSource,c,t,dS,eqn)
+DEFINE_SOURCE (m_0_NucSourceBenz,c,t,dS,eqn)
 {
 
-    /* Source for pyrene nucleation */
+
+
+    real sourceBenz = benzNucSource(c,t); 
+
+    dS[eqn] = 0.0;
+    C_UDMI(c,t,0) = sourceBenz;
+    return sourceBenz;
+}
+
+DEFINE_SOURCE (m_1_NucSourcePyr,c,t,dS,eqn)
+{
+
     real sourcePyr = (2*NPyr)*pyrNucSource(c,t); 
     real source = sourcePyr; 
-    /* Pyrene nucleation source calculation ends */
 
-    /* Source for benzene nucleation 
+
+    dS[eqn] = 0.0;
+    C_UDMI(c,t,1) = source;
+    return source;
+
+DEFINE_SOURCE (m_1_NucSourceBenz,c,t,dS,eqn)
+{
+
     real sourceBenz = (2*NBenzene)*benzNucSource(c,t); 
     real source = sourceBenz;
-    /*Benzene nucleation source ends */
 
     dS[eqn] = 0.0;
     C_UDMI(c,t,1) = source;
     return source;
 }
 
-DEFINE_SOURCE (m_2_NucSource,c,t,dS,eqn)
+DEFINE_SOURCE (m_2_NucSourcePyr,c,t,dS,eqn)
 {
 
-    /* Source for pyrene nucleation */
     real sourcePyr = (2*NPyr)*(2*NPyr)*pyrNucSource(c,t);
     real source = sourcePyr; 
-    /* Pyrene nucleation source calculation ends */
 
-    /* Source for benzene nucleation 
+    dS[eqn] = 0.0;
+    C_UDMI(c,t,2) = source;
+    return source;
+}
+
+DEFINE_SOURCE (m_2_NucSourceBenz,c,t,dS,eqn)
+{
+
     real sourceBenz = (2*NBenzene)*(2*NBenzene)*benzNucSource(c,t); 
     real source = sourceBenz;
-    /*Benzene nucleation source ends */
 
     dS[eqn] = 0.0;
     C_UDMI(c,t,2) = source;
