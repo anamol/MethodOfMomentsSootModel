@@ -113,6 +113,7 @@ UDM 22: Knudsen number
 #define NNaph 10
 
 /* MOMIC parameters */
+#define gammaAcet 1e-10
 #define gammaPyr 0.001
 #define gammaBenzene 0.001
 #define vDW 4.0
@@ -151,7 +152,20 @@ real lagInterp3mom(real p, real m0, real m1, real m2); /* Lagragian interpolatio
 real logInterp(real p, real a, real b, real M, real N); /* logarithmic interpolation */
 real pyrNucSource(cell_t c,Thread *t);
 real benzNucSource(cell_t c,Thread *t);
+real acetNucSource(cell_t c,Thread *t);
 real chiSootCalc(cell_t c,Thread *t, real cellTemp, real cellRho);
+
+DEFINE_SOURCE (m_0_NucSourceAcet,c,t,dS,eqn)
+{
+
+
+    real sourceAcet = acetNucSource(c,t); 
+
+    dS[eqn] = 0.0;
+    C_UDMI(c,t,0) = sourceAcet;
+    return sourceAcet;
+}
+
 
 DEFINE_SOURCE (m_0_NucSourcePyr,c,t,dS,eqn)
 {
@@ -186,6 +200,7 @@ DEFINE_SOURCE (m_1_NucSourcePyr,c,t,dS,eqn)
     dS[eqn] = 0.0;
     C_UDMI(c,t,1) = source;
     return source;
+}
 
 DEFINE_SOURCE (m_1_NucSourceBenz,c,t,dS,eqn)
 {
