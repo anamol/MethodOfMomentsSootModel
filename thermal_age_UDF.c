@@ -36,6 +36,7 @@ DEFINE_INIT(init_alpha,d)
 	int cell_id[62400]; 
 	float thermal_age[62400];
 	float thermal_std[62400];
+	float alpha[62400];
 	int i = 0;
 	const char s[2] = ",";
 
