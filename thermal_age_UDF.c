@@ -62,7 +62,7 @@ DEFINE_INIT(init_alpha,d)
 	fclose(file);
 
 	cell_t c;
-	Thread* T;
+	Thread* t;
 	real xc[ND_ND];
 
 	thread_loop_c(t,d)
