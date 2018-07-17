@@ -178,6 +178,17 @@ DEFINE_SOURCE (m_0_NucSourcePyr,c,t,dS,eqn)
     return sourcePyr;
 }
 
+DEFINE_SOURCE (pdf_m_0_NucSourcePyr,c,t,dS,eqn)
+{
+
+
+    real sourcePyr = pdf_pyrNucSource(c,t); 
+
+    dS[eqn] = 0.0;
+    C_UDMI(c,t,0) = sourcePyr;
+    return sourcePyr;
+}
+
 DEFINE_SOURCE (m_0_NucSourceBenz,c,t,dS,eqn)
 {
 
@@ -678,6 +689,85 @@ real pyrNucSource(cell_t c,Thread *t)
     sourcePyrNuc = sourcePyrNuc/normParameter;
     return sourcePyrNuc;
 }
+
+real pdf_pyrNucSource(cell_t c,Thread *t)
+{
+    Material *mat = THREAD_MATERIAL(t); 
+    int idPyr = mixture_specie_index(mat, "a4"); 
+    real pyrMf = Pdf_Yi(c,t,idPyr);
+    real pyrMfMean = Pdf_Yi(c,t,idPyr);
+    real CNucPyr = vDW*sqrt(4*pi*kB/(mC*NPyr))*pow(dPyr*avogad,2);
+    real cellPressure = (C_P(c,t) + Patm)/1e5;
+    real multConstant = gammaPyr*CNucPyr*cellPressure*cellPressure/(R*R);
+    
+    real tempMean = C_T(c,t);
+    real tempVar = C_UDMI(c,t,36);
+    real pyrMfVar = C_UDMI(c,t,37);
+
+    real tempPDFIntegral = 0.0;
+    real tempOnlyPDFIntegral = 0.0;
+    real pyrPDFIntegral = 0.0;
+    real pyrOnlyPDFIntegral;
+    real lowerLim = 0.0;
+    real upperLim = 0.0;
+
+    if (tempVar/tempMean > 0.02)
+    {
+        if (tempMean - 3.5*tempVar > 300) { lowerLim = tempMean - 3.5*tempVar; }
+        else { real lowerLim = 300; }
+
+        upperLim = tempMean + 4.0*tempVar;
+
+        for (int ctr = 1 ; ctr < 15; ctr = ctr + 1)
+        {
+            real temp = lowerLim + 0.5*ctr*tempVar;
+            real temp0 = pow(temp - 0.5*tempVar,-3/2)*1/(sqrt(2*pi)*tempVar)*exp(-(pow(temp - 0.5*tempVar - tempMean, 2))/(2*tempVar*tempVar));
+            real temp1 = pow(temp,-3/2)*1/(sqrt(2*pi)*tempVar)*exp(-(pow(temp - tempMean, 2))/(2*tempVar*tempVar));
+            real tempdf0 = 1/(sqrt(2*pi)*tempVar)*exp(-(pow(temp - 0.5*tempVar - tempMean, 2))/(2*tempVar*tempVar));
+            real tempdf1 = 1/(sqrt(2*pi)*tempVar)*exp(-(pow(temp - tempMean, 2))/(2*tempVar*tempVar));
+
+            tempPDFIntegral = tempPDFIntegral + 0.5*(temp0 + temp1)*0.5*tempVar;
+            tempOnlyPDFIntegral = tempOnlyPDFIntegral + 0.5*(tempdf0 + tempdf1)*0.5*tempVar;
+        }
+    
+        tempPDFIntegral = tempPDFIntegral/tempOnlyPDFIntegral;
+    }
+
+    if (tempVar/tempMean < 0.02)
+    {
+        tempPDFIntegral = pow(tempMean, -3/2);
+    }
+
+    if (pyrMfVar/pyrMfMean > 0.02)
+    {
+        if (pyrMfMean - 3.5*pyrMfVar > 0) { lowerLim = pyrMfMean - 3.5*pyrMfVar; }
+        else { lowerLim = 0; }
+
+        if (pyrMfMean + 3.5*pyrMfVar < 1) { upperLim = pyrMfMean + 4*pyrMfVar; }
+        else { upperLim = 1.0; }
+
+        for (int ctr = 1; ctr < 15; ctr = ctr + 1)
+        {
+            real pyr = lowerLim + 0.5*ctr*pyrMfVar;
+            real pyr0 = pow(pyr - 0.5*pyrMfVar, 2)*1/(sqrt(2*pi)*pyrMfVar)*exp(-(pow(pyr - 0.5*pyrMfVar - pyrMfMean, 2))/(2*pyrMfVar*pyrMfVar));
+            real pyr1 = pow(pyr, 2)*1/(sqrt(2*pi)*pyrMfVar)*exp(-(pow(pyr - pyrMfMean, 2))/(2*pyrMfVar*pyrMfVar));
+
+            pyrPDFIntegral = pyrPDFIntegral + 0.5*(pyr0 + pyr1)*0.5*pyrMfVar;
+            pyrOnlyPDFIntegral = pyrOnlyPDFIntegral + 0.5*(pyr0 + pyr1)*0.5*pyrMfVar;
+        }
+
+        pyrPDFIntegral = pyrPDFIntegral/pyrOnlyPDFIntegral;
+    
+    }
+
+    if (pyrMfVar/pyrMfMean < 0.02)
+    {
+        pyrPDFIntegral = pow(pyrMfMean, 2);
+    }
+    
+    real sourcePyrNuc = multConstant*tempPDFIntegral*pyrPDFIntegral;
+}
+
 
 real benzNucSource(cell_t c,Thread *t)
 {
