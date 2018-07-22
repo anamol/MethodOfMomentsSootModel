@@ -1,4 +1,4 @@
-\/* Soot Method of Moments with Interpolative Closure Model For ANSYS FLUENT 17.2
+/* Soot Method of Moments with Interpolative Closure Model For ANSYS FLUENT 17.2
 
 ***********************************************
 *   Anamol Pundle                             *
@@ -308,6 +308,7 @@ DEFINE_SOURCE (pdf_m_1_C2H2Source,c,t,dS,eqn)
     real temp;
     real C2H2;
     real C2H2_new;
+    real cellRho = C_R(c,t);
     real tempUpper = 0.0;
     real tempLower = 0.0;
     real C2H2Lower = 0.0;
@@ -371,7 +372,7 @@ DEFINE_SOURCE (pdf_m_1_C2H2Source,c,t,dS,eqn)
         real P_low = gaussianMonoPDFCalc(tempLower, cellTempAvg, cellTempRMS);
 
         real f_high = pow(tempUpper, n4 - 2.0) * exp(-Ea4/(R*tempUpper)) * alpha_high * ChiSoot_high * gaussianMonoPDFCalc(tempUpper, cellTempAvg, cellTempRMS);
-        real P_low = gaussianMonoPDFCalc(tempUpper, cellTempAvg, cellTempRMS);
+        real P_high = gaussianMonoPDFCalc(tempUpper, cellTempAvg, cellTempRMS);
 
         real f_xi = 0.0; real P_xi = 0.0;
 
@@ -393,7 +394,7 @@ DEFINE_SOURCE (pdf_m_1_C2H2Source,c,t,dS,eqn)
 
     else if (cellTempAvg/cellTempRMS < 0.02 && C2H2MfRMS/C2H2MfAvg >= 0.02)
     {
-        real alpha = HACAalphaCalc(cellTempAvg, cellM0, cellM1, cellM2);
+        real alpha = HACAalphaCalc(cellTempAvg, cellM0, cellM1);
         real chiSoot = pdfChiSootCalc(cellTempAvg, cellPressure, C_RGAS(c,t), HMf, OHMf, H2Mf, H2OMf, C2H2MfAvg, O2Mf);
 
         if (C2H2MfAvg - 3.5 * C2H2MfRMS > 0) { C2H2Lower = C2H2MfAvg - 3.5 * C2H2MfRMS; }
