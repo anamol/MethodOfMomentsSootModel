@@ -1104,13 +1104,13 @@ real HACAIntegrandCalc(real Temp, real TempAvg, real TempRMS, real C2H2Mf, real 
 
 real fractionalMoments(real p, real m0, real m1, real m2)
 {
-    real fracMoment = pow(m0, 0.5*p*(p-1)) * pow(m1, -p*(p-2)) * pow(m2, 0.5*p(p-3));
+    real fracMoment = pow(m0, 0.5*p*(p-1)) * pow(m1, -p*(p-2)) * pow(m2, 0.5*p*(p-3));
     return fracMoment;
 }
 
 real gaussianMonoPDFCalc(real Var, real VarMean, real VarStd)
 {
-    real value = 1/(VarStd * sqrt(2.0*pi)) * exp(- (pow(Var - VarMean), 2)/(2.0 * VarStd * VarStd));
+    real value = 1/(VarStd * sqrt(2.0*pi)) * exp(-pow((Var - VarMean), 2)/(2.0 * VarStd * VarStd));
     return value;
 }
 
