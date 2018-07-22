@@ -253,6 +253,17 @@ DEFINE_SOURCE (m_2_NucSourcePyr,c,t,dS,eqn)
     return source;
 }
 
+DEFINE_SOURCE (pdf_m_2_NucSourcePyr,c,t,dS,eqn)
+{
+
+    real sourcePyr = (2*NPyr)*(2*NPyr)*pdfpyrNucSource(c,t);
+    real source = sourcePyr; 
+
+    dS[eqn] = 0.0;
+    C_UDMI(c,t,2) = source;
+    return source;
+}
+
 DEFINE_SOURCE (m_2_NucSourceBenz,c,t,dS,eqn)
 {
 
