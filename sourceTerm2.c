@@ -160,6 +160,8 @@ real HACAalphaCalc(real Temp, real cellM0, real cellM1);
 real fractionalMoments(real p, real m0, real m1, real m2);
 real HACAIntegrandCalc(real Temp, real TempAvg, real TempRMS, real C2H2Mf, real C2H2MfAvg, real C2H2MfRMS, real alpha, real ChiSoot);
 real gaussianMonoPDFCalc(real Var, real VarMean, real VarStd);
+real fracMomFirstDiffM1(real p, real m0, real m1, real m2);
+real fracMomFirstDiffM2(real p, real m0, real m1, real m2);
 
 DEFINE_SOURCE (m_0_NucSourceAcet,c,t,dS,eqn)
 {
@@ -529,7 +531,7 @@ DEFINE_SOURCE (pdf_m_1_C2H2Source,c,t,dS,eqn)
 
     source = multConstant * integrand;
 
-    muTwoThirdDiff = fracMomFirstDiffM1(twoThird, cellM0, cellM1, cellM2);
+    real muTwoThirdDiff = fracMomFirstDiffM1(twoThird, cellM0, cellM1, cellM2);
 
     dS[eqn] = 2 * A4 * cellPressure/(RGas*C2H2MW)*pow(Cs, 2) * pi * muTwoThirdDiff * integrand;
 
