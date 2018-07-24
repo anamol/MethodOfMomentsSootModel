@@ -795,8 +795,8 @@ DEFINE_SOURCE (pdf_m_2_C2H2Source,c,t,dS,eqn)
 
     source = multConstant * integrand;
 
-    real muTwoThirdDiff = fracMomFirstDiffM1(twoThird, cellM0, cellM1, cellM2);
-    real muFiveThirdDiff = fracMomFirstDiffM1(5 * oneThird, cellM0, cellM1, cellM2);
+    real muTwoThirdDiff = fracMomFirstDiffM2(twoThird, cellM0, cellM1, cellM2);
+    real muFiveThirdDiff = fracMomFirstDiffM2(5 * oneThird, cellM0, cellM1, cellM2);
 
     dS[eqn] = 2 * A4 * cellPressure/(RGas*C2H2MW)*pow(Cs, 2) * pi * (4 * muTwoThirdDiff + 4 * muFiveThirdDiff) * integrand;
 
