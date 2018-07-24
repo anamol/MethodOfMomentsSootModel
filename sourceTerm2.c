@@ -616,7 +616,7 @@ DEFINE_SOURCE (pdf_m_2_C2H2Source,c,t,dS,eqn)
     real muTwoThird = fractionalMoments(twoThird, cellM0, cellM1, cellM2);
     real muFiveThird = fractionalMoments(5*oneThird, cellM0, cellM1, cellM2); 
 
-    real multConstant = 2 * A4 * cellPressure/(RGas*C2H2MW)*pow(Cs, 2) * pi * (4 * muTwoThird + 4 * muFiveThird) * cellM0;
+    real multConstant = A4 * cellPressure/(RGas*C2H2MW)*pow(Cs, 2) * pi * (4 * muTwoThird + 4 * muFiveThird) * cellM0;
     real tempRatio = cellTempRMS/(cellTempAvg);
     real C2H2MfRatio = C2H2MfRMS/(C2H2MfAvg + 1e-7);
 
@@ -798,7 +798,7 @@ DEFINE_SOURCE (pdf_m_2_C2H2Source,c,t,dS,eqn)
     real muTwoThirdDiff = fracMomFirstDiffM2(twoThird, cellM0, cellM1, cellM2);
     real muFiveThirdDiff = fracMomFirstDiffM2(5 * oneThird, cellM0, cellM1, cellM2);
 
-    dS[eqn] = 2 * A4 * cellPressure/(RGas*C2H2MW)*pow(Cs, 2) * pi * (4 * muTwoThirdDiff + 4 * muFiveThirdDiff) * integrand;
+    dS[eqn] = A4 * cellPressure/(RGas*C2H2MW)*pow(Cs, 2) * pi * (4 * muTwoThirdDiff + 4 * muFiveThirdDiff) * integrand;
 
     C_UDMI(c,t,3) = source;
 
