@@ -321,8 +321,6 @@ DEFINE_SOURCE (pdf_m_1_C2H2Source,c,t,dS,eqn)
     real C2H2_new;
     real RGas = C_RGAS(c,t) * 1e-3;
     real cellRho = C_R(c,t);
-    real tempUpper = 0.0;
-    real tempLower = 0.0;
     real C2H2Lower = 0.0;
     real C2H2Upper = 0.0;
 
@@ -367,6 +365,7 @@ DEFINE_SOURCE (pdf_m_1_C2H2Source,c,t,dS,eqn)
 
     else if (cellTempAvg/cellTempRMS >= 0.02 && C2H2MfRMS/C2H2MfAvg < 0.02)
     {
+        real tempUpper; real tempLower;
         tempUpper = cellTempAvg + 3.5 *cellTempRMS;
 
         if (cellTempAvg - 3.5 * cellTempRMS > 300) { tempLower = cellTempAvg - 3.5 * cellTempRMS; }
@@ -1123,7 +1122,7 @@ real fractionalMoments(real p, real m0, real m1, real m2)
 
 real gaussianMonoPDFCalc(real Var, real VarMean, real VarStd)
 {
-    real value = 1/(VarStd * sqrt(2.0*pi)) * exp(-pow((Var - VarMean), 2)/(2.0 * VarStd * VarStd));
+    real value = 1/(VarStd * sqrt(2.0*pi)) * exp(-pow(Var - VarMean, 2)/(2.0 * VarStd * VarStd));
     return value;
 }
 
