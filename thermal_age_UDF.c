@@ -4,6 +4,42 @@
 #include "stdlib.h"
 
 #define mesh_size 62400
+#define mC 1.9944e-26 /* kg/atom */
+#define normParameter 1e15
+#define rhoSoot 1800 /* kg/m3*/
+
+DEFINE_ADJUST(find_ta_max, d)
+{
+	cell_t c;
+	Thread* t;
+	real ta_max = 0.0;
+	real fv = 0;
+
+	thread_loop_c(t,d)
+	{
+		begin_c_loop(c,t)
+		{
+			real fv_temp = C_UDSI(c,t,1) * normParameter * mC * C_R(c,t) / rhoSoot;
+			if (fv_temp > fv)
+			{
+				ta_max = C_UDSI(c,t,30);
+				fv = fv_temp;
+			}
+
+		}
+		end_c_loop(c,t)
+	}
+
+	thread_loop_c(t,d)
+	{
+		begin_c_loop(c,t)
+		{
+			C_UDMI(c,t,41) = ta_max;
+
+		}
+		end_c_loop(c,t)
+	}
+}
 
 DEFINE_INIT(thermal_age_setup,domain)
 {
