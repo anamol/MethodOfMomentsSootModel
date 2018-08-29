@@ -449,8 +449,6 @@ DEFINE_SOURCE(pdf_m_1_OxSource,c,t,dS,eqn)
     sourceO2 = O2multConstant * integrandO2;
 
     real muTwoThirdDiff = fracMomFirstDiffM1(twoThird, cellM0, cellM1, cellM2);
-    /*real OHdiff = -gammaOH * cellPressure * pow(Cs, 2) * sqrt(pi * kB/(2 * mOH)) * cellM0 * avogad * muTwoThirdDiff /(OHMW * RGas);
-    real O2diff = -2 * A5 * O2Mf * cellPressure * pi * pow(Cs, 2) * muTwoThirdDiff * cellM0 / RGas; */
 
     real OHdiff = sourceOH / muTwoThird * muTwoThirdDiff;
     real O2diff = sourceO2 / muTwoThird * muTwoThirdDiff;
@@ -568,7 +566,7 @@ DEFINE_SOURCE(pdf_m_2_OxSource,c,t,dS,eqn)
     real muFiveThird = fractionalMoments(5.0 * oneThird, cellM0, cellM1, cellM2); 
 
     real OHmultConstant =  gammaOH * cellPressure * pow(Cs, 2) * sqrt(pi * kB/(2 * mOH)) * cellM0 * \
-    (4 * muTwoThird - 4 * muFiveThird) * /(OHMW * RGas);
+    (4 * muTwoThird - 4 * muFiveThird) /(OHMW * RGas);
 
     real O2multConstant = A5 * cellPressure * pi * pow(Cs, 2) * (4 * muTwoThird - 4 * muFiveThird) * cellM0 / RGas;
 
@@ -919,8 +917,6 @@ DEFINE_SOURCE(pdf_m_2_OxSource,c,t,dS,eqn)
 
     real muTwoThirdDiff = fracMomFirstDiffM2(twoThird, cellM0, cellM1, cellM2);
     real muFiveThirdDiff = fracMomFirstDiffM2(5.0 * oneThird, cellM0, cellM1, cellM2);
-    /*real OHdiff = -gammaOH * cellPressure * pow(Cs, 2) * sqrt(pi * kB/(2 * mOH)) * cellM0 * avogad * muTwoThirdDiff /(OHMW * RGas);
-    real O2diff = -2 * A5 * O2Mf * cellPressure * pi * pow(Cs, 2) * muTwoThirdDiff * cellM0 / RGas; */
 
     real OHdiff = sourceOH / (4 * muTwoThird - 4 * muFiveThird) * (4 * muTwoThirdDiff - 4 * muFiveThirdDiff);
     real O2diff = sourceO2 / (4 * muTwoThird - 4 * muFiveThird) * (4 * muTwoThirdDiff - 4 * muFiveThirdDiff);

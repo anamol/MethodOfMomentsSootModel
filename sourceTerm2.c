@@ -1378,7 +1378,7 @@ DEFINE_SOURCE(pdf_m_2_OxSource,c,t,dS,eqn)
     real muFiveThird = fractionalMoments(5.0 * oneThird, cellM0, cellM1, cellM2); 
 
     real OHmultConstant =  gammaOH * cellPressure * pow(Cs, 2) * sqrt(pi * kB/(2 * mOH)) * cellM0 * \
-    (4 * muTwoThird - 4 * muFiveThird) * /(OHMW * RGas);
+    (4 * muTwoThird - 4 * muFiveThird) /(OHMW * RGas);
 
     real O2multConstant = A5 * cellPressure * pi * pow(Cs, 2) * (4 * muTwoThird - 4 * muFiveThird) * cellM0 / RGas;
 
