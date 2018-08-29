@@ -565,7 +565,7 @@ DEFINE_SOURCE (pdf_m_2_C2H2Source,c,t,dS,eqn)
 
     /* dS[eqn] = A4 * cellPressure/(RGas*C2H2MW)*pow(Cs, 2) * pi * (4 * muTwoThirdDiff + 4 * muFiveThirdDiff) * integrand; */
 
-    C_UDMI(c,t,3) = source;
+    C_UDMI(c,t,4) = source;
 
     return source;
 }

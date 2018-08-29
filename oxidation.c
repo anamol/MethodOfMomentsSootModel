@@ -924,9 +924,9 @@ DEFINE_SOURCE(pdf_m_2_OxSource,c,t,dS,eqn)
     dS[eqn] = OHdiff + O2diff;
     real source = sourceOH + sourceO2;
 
-    C_UDMI(c,t,5) = sourceOH;
-    C_UDMI(c,t,6) = sourceO2;
-    C_UDMI(c,t,7) = source;
+    C_UDMI(c,t,8) = sourceOH;
+    C_UDMI(c,t,9) = sourceO2;
+    C_UDMI(c,t,10) = source;
 
     return source;
 }
