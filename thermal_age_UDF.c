@@ -13,7 +13,7 @@ DEFINE_ADJUST(find_ta_max, d)
 	cell_t c;
 	Thread* t;
 	real ta_max = 0.0;
-	real fv = 0;
+	real fv = 0.0;
 
 	thread_loop_c(t,d)
 	{
