@@ -101,7 +101,7 @@ DEFINE_SOURCE(pdf_m_1_OxSource,c,t,dS,eqn)
     real muTwoThird = fractionalMoments(twoThird, cellM0, cellM1, cellM2); 
 
     real OHmultConstant =  -gammaOH * cellPressure * pow(Cs, 2) * sqrt(pi * kB/(2 * mOH)) * cellM0 * muTwoThird /(OHMW * RGas);
-    real O2multConstant = -2 * A5 * cellPressure * pi * pow(Cs, 2) * muTwoThird * cellM0 / RGas;
+    real O2multConstant = -2 * A5 * cellPressure * pi * pow(Cs, 2) * muTwoThird * cellM0 / (O2MW * RGas);
 
     real tempRatio = cellTempRMS/(cellTempAvg);
     real OHMfRatio = OHMfRMS/(OHMfAvg + 1e-8);
@@ -568,7 +568,7 @@ DEFINE_SOURCE(pdf_m_2_OxSource,c,t,dS,eqn)
     real OHmultConstant =  gammaOH * cellPressure * pow(Cs, 2) * sqrt(pi * kB/(2 * mOH)) * cellM0 * \
     (4 * muTwoThird - 4 * muFiveThird) /(OHMW * RGas);
 
-    real O2multConstant = A5 * cellPressure * pi * pow(Cs, 2) * (4 * muTwoThird - 4 * muFiveThird) * cellM0 / RGas;
+    real O2multConstant = A5 * cellPressure * pi * pow(Cs, 2) * (4 * muTwoThird - 4 * muFiveThird) * cellM0 / (O2MW * RGas);
 
     real tempRatio = cellTempRMS/(cellTempAvg);
     real OHMfRatio = OHMfRMS/(OHMfAvg + 1e-8);
