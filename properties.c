@@ -30,6 +30,32 @@ DEFINE_PROPERTY(abs_coeff_Sazhin,c,t)
     return absCoeff;
 }
 
+DEFINE_WSGGM_ABS_COEFF(wsggm_abs_coeff_Sazhin, c, t, xi, p_t, s, soot_conc, Tcell, nb, ab_wsggm, ab_soot)
+{
+	real cellTemp = C_T(c,t);
+    real cellRho = C_R(c,t);
+    real cellM1 = C_UDSI(c,t,1);
+    real sootfv = cellM1*mC*cellRho/rhoSoot*normParameter;
+
+    real absCoeff = 1232.4*rhoSoot*sootfv*(1+4.8e-4*(cellTemp-2000));
+
+    
+    *ab_wsggm = *ab_wsggm + absCoeff;
+    
+}
+
+DEFINE_WSGGM_ABS_COEFF(wsggm_abs_coeff_Widmann, c, t, xi, p_t, s, soot_conc, Tcell, nb, ab_wsggm, ab_soot)
+{
+	real cellTemp = C_T(c,t);
+    real cellRho = C_R(c,t);
+    real cellM1 = C_UDSI(c,t,1);
+    real sootfv = cellM1*mC*cellRho/rhoSoot*normParameter;
+
+    real absCoeff = 2370*cellTemp*sootfv;
+
+    *ab_wsggm = *ab_wsggm + absCoeff;
+}
+
 DEFINE_PROPERTY(thermal_conductivity,c,t)
 {
     real cellTemp = C_T(c,t);
