@@ -227,6 +227,14 @@ real O2IntegrandCalc(real Temp, real TempAvg, real TempRMS, real O2Mf, real O2Mf
     return integrand;
 }
 
+real O2IntegrandCalc_TApdf(real Temp, real TempAvg, real TempRMS, real TA, real TAAvg, real TARMS, real ta_max, real ChiSoot)
+{
+    real P_Temp = gaussianMonoPDFCalc(Temp, TempAvg, TempRMS);
+    real P_TA = gaussianMonoPDFCalc(TA, TAAvg, TARMS);
+    real integrand = pow(Temp,- 1.0) * exp(-Ea5/(R*Temp)) * alphaOxCalculator(TA, ta_max) * ChiSoot * P_Temp * P_TA;
+    return integrand;
+}
+
 real fractionalMoments(real p, real m0, real m1, real m2)
 {
     real fracMoment = pow(m0, 0.5*p*(p-3)) * pow(m1, -p*(p-2)) * pow(m2, 0.5*p*(p-1));
