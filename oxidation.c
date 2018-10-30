@@ -484,6 +484,8 @@ DEFINE_SOURCE(pdf_m_1_OxSource_alphaOxPDF,c,t,dS,eqn)
     real pdfIntegrandO2 = 0.0;
 
     real temp;
+    real TA;
+    real TA_new;
     real OH;
     real OH_new;
     real O2;
@@ -633,7 +635,7 @@ DEFINE_SOURCE(pdf_m_1_OxSource_alphaOxPDF,c,t,dS,eqn)
 
     if (tempRatio < 0.02 && TARatio < 0.02)
     {
-        real alpha_low = alphaOxCalculator(ta_max, TAAvg);
+        real alpha = alphaOxCalculator(ta_max, TAAvg);
         real chiSoot = pdfChiSootCalc(cellTempAvg, cellPressure, RGas, HMf, OHMfAvg, H2Mf, H2OMf, C2H2Mf, O2MfAvg);
         integrandO2 = 1 / cellTempAvg * exp(-Ea5/(R*cellTempAvg)) * alpha * chiSoot;
         pdfIntegrandO2 = 1.0;
@@ -653,7 +655,7 @@ DEFINE_SOURCE(pdf_m_1_OxSource_alphaOxPDF,c,t,dS,eqn)
         if (TAAvg - 3.5 * TARMS > 0) { TALower = TAAvg - 3.5 * TARMS; }
         else { TALower = 0.0; }
 
-        TAUpper = TAAvg + 3.5 * TARMS
+        TAUpper = TAAvg + 3.5 * TARMS;
 
         real tempInt = 0.5 * cellTempRMS; real TAInt = 0.5 * TARMS;
 
@@ -1211,7 +1213,7 @@ DEFINE_SOURCE(pdf_m_2_OxSource,c,t,dS,eqn)
     return source;
 }
 
-DEFINE_SOURCE(pdf_m_2_OxSource,c,t,dS,eqn)
+DEFINE_SOURCE(pdf_m_2_OxSource_alphaOxPDF,c,t,dS,eqn)
 {
     real sourceOH = 0.0;
     real integrandOH = 0.0;
@@ -1222,6 +1224,8 @@ DEFINE_SOURCE(pdf_m_2_OxSource,c,t,dS,eqn)
     real pdfIntegrandO2 = 0.0;
 
     real temp;
+    real TA;
+    real TA_new;
     real OH;
     real OH_new;
     real O2;
@@ -1374,7 +1378,7 @@ DEFINE_SOURCE(pdf_m_2_OxSource,c,t,dS,eqn)
 
     if (tempRatio < 0.02 && TARatio < 0.02)
     {
-        real alpha_low = alphaOxCalculator(ta_max, TAAvg);
+        real alpha = alphaOxCalculator(ta_max, TAAvg);
         real chiSoot = pdfChiSootCalc(cellTempAvg, cellPressure, RGas, HMf, OHMfAvg, H2Mf, H2OMf, C2H2Mf, O2MfAvg);
         integrandO2 = 1 / cellTempAvg * exp(-Ea5/(R*cellTempAvg)) * alpha * chiSoot;
         pdfIntegrandO2 = 1.0;
@@ -1394,7 +1398,7 @@ DEFINE_SOURCE(pdf_m_2_OxSource,c,t,dS,eqn)
         if (TAAvg - 3.5 * TARMS > 0) { TALower = TAAvg - 3.5 * TARMS; }
         else { TALower = 0.0; }
 
-        TAUpper = TAAvg + 3.5 * TARMS
+        TAUpper = TAAvg + 3.5 * TARMS;
 
         real tempInt = 0.5 * cellTempRMS; real TAInt = 0.5 * TARMS;
 
