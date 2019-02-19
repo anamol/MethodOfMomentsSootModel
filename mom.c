@@ -243,7 +243,10 @@ real fractionalMoments(real p, real m0, real m1, real m2)
 
 real gaussianMonoPDFCalc(real Var, real VarMean, real VarStd)
 {
+
     real value = 1/(VarStd * sqrt(2.0*pi)) * exp(-pow(Var - VarMean, 2)/(2.0 * VarStd * VarStd));
+    
+    
     return value;
 }
 
@@ -260,6 +263,10 @@ real factorialCalc(n)
 
 real alphaOxCalculator(real ta, real ta_max)
 {
+    if (ta == 0.0)
+    {
+        ta = 1e-5;
+    }
     real retval = pow(ta_max/ta, 2) * exp(2*(1 - ta_max/ta));
     return retval;
 }
