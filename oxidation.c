@@ -476,7 +476,7 @@ DEFINE_SOURCE(pdf_m_1_OxSource,c,t,dS,eqn)
     return source;
 }
 
-DEFINE_SOURCE(temp_pdf_m_1_OxSource,c,t,dS,eqn)
+DEFINE_SOURCE(temppdf_m_1_OxSource,c,t,dS,eqn)
 {
     real sourceOH = 0.0;
     real integrandOH = 0.0;
@@ -515,6 +515,7 @@ DEFINE_SOURCE(temp_pdf_m_1_OxSource,c,t,dS,eqn)
     real O2MfRMS = C_UDMI(c,t,40);
 
     real ta_max = C_UDMI(c,t,41);
+    real alpha = C_UDMI(c,t,32);
 
     int idH2 = mixture_specie_index(mat, "h2");
     int idH = mixture_specie_index(mat, "h");
@@ -528,9 +529,12 @@ DEFINE_SOURCE(temp_pdf_m_1_OxSource,c,t,dS,eqn)
     real C2H2Mf = Pdf_Yi(c,t,idC2H2);
 
     real Cs = pow((6*mC/(pi*rhoSoot)),oneThird);
+    real chiSoot = chiSootCalc(c,t,cellTempAvg,cellRho);
     real muTwoThird = fractionalMoments(twoThird, cellM0, cellM1, cellM2); 
 
-    real OHmultConstant =  -gammaOH * cellPressure * pow(Cs, 2) * sqrt(pi * kB/(2 * mOH)) * cellM0 * muTwoThird /(OHMW * RGas);
+    real OHmultConstant = -2*gammaOH * cellPressure * pow(Cs,2) * sqrt(pi*kB/(2*mOH)) * alpha * chiSoot * pi* cellM0 * muTwoThird/(OHMW * RGas);
+
+    /*real OHmultConstant =  -gammaOH * cellPressure * pow(Cs, 2) * sqrt(pi * kB/(2 * mOH)) * cellM0 * muTwoThird /(OHMW * RGas);*/
     real O2multConstant = -2 * A5 * cellPressure * pi * pow(Cs, 2) * muTwoThird * cellM0 / (O2MW * RGas);
 
     real tempRatio = cellTempRMS/(cellTempAvg);
@@ -593,7 +597,7 @@ DEFINE_SOURCE(temp_pdf_m_1_OxSource,c,t,dS,eqn)
     if (tempRatio < 0.02)
     {
         /*real alpha = HACAalphaCalc(cellTempAvg, cellM0, cellM1); */
-        real alpha = alphaOxCalculator(ta_max, TAAvg);
+        /*real alpha = alphaOxCalculator(ta_max, TAAvg);*/
         real chiSoot = pdfChiSootCalc(cellTempAvg, cellPressure, RGas, HMf, OHMfAvg, H2Mf, H2OMf, C2H2Mf, O2MfAvg);
         integrandO2 = 1 / cellTempAvg * exp(-Ea5/(R*cellTempAvg)) * alpha * chiSoot * O2MfAvg;
         pdfIntegrandO2 = 1.0;
@@ -615,18 +619,18 @@ DEFINE_SOURCE(temp_pdf_m_1_OxSource,c,t,dS,eqn)
         /*real alpha_low = HACAalphaCalc(tempLower, cellM0, cellM1);
         real alpha_high = HACAalphaCalc(tempUpper, cellM0, cellM1); */
 
-        real alpha_low = alphaOxCalculator(ta_max, TAAvg);
-        real alpha_high = alphaOxCalculator(ta_max, TAAvg);
+        /*real alpha_low = alphaOxCalculator(ta_max, TAAvg);
+        real alpha_high = alphaOxCalculator(ta_max, TAAvg);*/
 
         real ChiSoot_low = pdfChiSootCalc(tempLower, cellPressure, RGas, HMf, OHMfAvg, H2Mf, H2OMf, C2H2Mf, O2MfAvg);
         real ChiSoot_high = pdfChiSootCalc(tempUpper, cellPressure, RGas, HMf, OHMfAvg, H2Mf, H2OMf, C2H2Mf, O2MfAvg);
 
-        real f_low = 1 / tempLower * exp(-Ea5/(R*tempLower)) * alpha_low * ChiSoot_low * \
+        real f_low = 1 / tempLower * exp(-Ea5/(R*tempLower)) * alpha * ChiSoot_low * \
         gaussianMonoPDFCalc(tempLower, cellTempAvg, cellTempRMS);
 
         real P_low = gaussianMonoPDFCalc(tempLower, cellTempAvg, cellTempRMS);
 
-        real f_high = 1 / tempLower * exp(-Ea5/(R*tempUpper)) * alpha_high * ChiSoot_high * \
+        real f_high = 1 / tempUpper * exp(-Ea5/(R*tempUpper)) * alpha * ChiSoot_high * \
         gaussianMonoPDFCalc(tempUpper, cellTempAvg, cellTempRMS);
 
         real P_high = gaussianMonoPDFCalc(tempUpper, cellTempAvg, cellTempRMS);
@@ -640,7 +644,7 @@ DEFINE_SOURCE(temp_pdf_m_1_OxSource,c,t,dS,eqn)
         {
             temp = tempLower + ctr * tempInt;
             /*real alpha = HACAalphaCalc(temp, cellM0, cellM1); */
-            real alpha = alphaOxCalculator(ta_max, TAAvg);
+            /*real alpha = alphaOxCalculator(ta_max, TAAvg);*/
             real ChiSoot = pdfChiSootCalc(temp, cellPressure,RGas, HMf, OHMfAvg, H2Mf, H2OMf, C2H2Mf, O2MfAvg);
 
             f_xi = f_xi + 1 / temp * exp(-Ea5/(R*temp)) * alpha * ChiSoot * gaussianMonoPDFCalc(temp, cellTempAvg, cellTempRMS);
@@ -1650,6 +1654,7 @@ DEFINE_SOURCE(temppdf_m_2_OxSource,c,t,dS,eqn)
     real O2MfAvg = Pdf_Yi(c,t,idO2);
     real O2MfRMS = C_UDMI(c,t,40);
 
+    real alpha = C_UDMI(c,t,32);
     real ta_max = C_UDMI(c,t,41);
 
     int idH2 = mixture_specie_index(mat, "h2");
@@ -1664,11 +1669,15 @@ DEFINE_SOURCE(temppdf_m_2_OxSource,c,t,dS,eqn)
     real C2H2Mf = Pdf_Yi(c,t,idC2H2);
 
     real Cs = pow((6*mC/(pi*rhoSoot)),oneThird);
+    real chiSoot = chiSootCalc(c,t,cellTempAvg,cellRho);
     real muTwoThird = fractionalMoments(twoThird, cellM0, cellM1, cellM2);
     real muFiveThird = fractionalMoments(5.0 * oneThird, cellM0, cellM1, cellM2); 
 
-    real OHmultConstant =  gammaOH * cellPressure * pow(Cs, 2) * sqrt(pi * kB/(2 * mOH)) * avogad * cellM0 * \
-    (4 * muTwoThird - 4 * muFiveThird) /(OHMW * RGas);
+    real OHmultConstant = gammaOH * cellPressure * pow(Cs,2) * sqrt(pi*kB/(2*mOH)) * alpha * chiSoot * pi* cellM0 *\
+     (4 * muTwoThird - 4 * muFiveThird)/(OHMW * RGas);
+
+    /*real OHmultConstant =  gammaOH * cellPressure * pow(Cs, 2) * sqrt(pi * kB/(2 * mOH)) * cellM0 * \
+    (4 * muTwoThird - 4 * muFiveThird) /(OHMW * RGas); */
 
     real O2multConstant = A5 * cellPressure * pi * pow(Cs, 2) * (4 * muTwoThird - 4 * muFiveThird) * cellM0 / (O2MW * RGas);
 
@@ -1731,8 +1740,8 @@ DEFINE_SOURCE(temppdf_m_2_OxSource,c,t,dS,eqn)
 
     if (tempRatio < 0.02)
     {
-        /*real alpha = HACAalphaCalc(cellTempAvg, cellM0, cellM1); */
-        real alpha = alphaOxCalculator(ta_max, TAAvg);
+        /*real alpha = HACAalphaCalc(cellTempAvg, cellM0, cellM1); 
+        real alpha = alphaOxCalculator(ta_max, TAAvg);*/
         real chiSoot = pdfChiSootCalc(cellTempAvg, cellPressure, RGas, HMf, OHMfAvg, H2Mf, H2OMf, C2H2Mf, O2MfAvg);
         integrandO2 = 1 / cellTempAvg * exp(-Ea5/(R*cellTempAvg)) * alpha * chiSoot * O2MfAvg;
         pdfIntegrandO2 = 1.0;
@@ -1752,20 +1761,20 @@ DEFINE_SOURCE(temppdf_m_2_OxSource,c,t,dS,eqn)
         real tempInt = 0.5 * cellTempRMS;
 
         /*real alpha_low = HACAalphaCalc(tempLower, cellM0, cellM1);
-        real alpha_high = HACAalphaCalc(tempUpper, cellM0, cellM1); */
+        real alpha_high = HACAalphaCalc(tempUpper, cellM0, cellM1); 
 
         real alpha_low = alphaOxCalculator(ta_max, TAAvg);
-        real alpha_high = alphaOxCalculator(ta_max, TAAvg);
+        real alpha_high = alphaOxCalculator(ta_max, TAAvg);*/
 
         real ChiSoot_low = pdfChiSootCalc(tempLower, cellPressure, RGas, HMf, OHMfAvg, H2Mf, H2OMf, C2H2Mf, O2MfAvg);
         real ChiSoot_high = pdfChiSootCalc(tempUpper, cellPressure, RGas, HMf, OHMfAvg, H2Mf, H2OMf, C2H2Mf, O2MfAvg);
 
-        real f_low = 1 / tempLower * exp(-Ea5/(R*tempLower)) * alpha_low * ChiSoot_low * \
+        real f_low = 1 / tempLower * exp(-Ea5/(R*tempLower)) * alpha * ChiSoot_low * \
         gaussianMonoPDFCalc(tempLower, cellTempAvg, cellTempRMS);
 
         real P_low = gaussianMonoPDFCalc(tempLower, cellTempAvg, cellTempRMS);
 
-        real f_high = 1 / tempLower * exp(-Ea5/(R*tempUpper)) * alpha_high * ChiSoot_high * \
+        real f_high = 1 / tempUpper * exp(-Ea5/(R*tempUpper)) * alpha * ChiSoot_high * \
         gaussianMonoPDFCalc(tempUpper, cellTempAvg, cellTempRMS);
 
         real P_high = gaussianMonoPDFCalc(tempUpper, cellTempAvg, cellTempRMS);
@@ -1778,8 +1787,8 @@ DEFINE_SOURCE(temppdf_m_2_OxSource,c,t,dS,eqn)
         for (ctr = 1; ctr < 13; ctr ++)
         {
             temp = tempLower + ctr * tempInt;
-            /*real alpha = HACAalphaCalc(temp, cellM0, cellM1); */
-            real alpha = alphaOxCalculator(ta_max, TAAvg);  
+            /*real alpha = HACAalphaCalc(temp, cellM0, cellM1); 
+            real alpha = alphaOxCalculator(ta_max, TAAvg);  */
             real ChiSoot = pdfChiSootCalc(temp, cellPressure,RGas, HMf, OHMfAvg, H2Mf, H2OMf, C2H2Mf, O2MfAvg);
 
             f_xi = f_xi + pow(temp, - 1.0) * exp(-Ea5/(R*temp)) * alpha * ChiSoot * gaussianMonoPDFCalc(temp, cellTempAvg, cellTempRMS);

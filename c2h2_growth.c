@@ -129,7 +129,7 @@ DEFINE_SOURCE (pdf_m_1_C2H2Source,c,t,dS,eqn)
 
         real P_low = gaussianMonoPDFCalc(tempLower, cellTempAvg, cellTempRMS);
 
-        real f_high = pow(tempUpper, n4) / tempLower * exp(-Ea4/(R*tempUpper)) * alpha_high * ChiSoot_high * \
+        real f_high = pow(tempUpper, n4) / tempUpper * exp(-Ea4/(R*tempUpper)) * alpha_high * ChiSoot_high * \
         gaussianMonoPDFCalc(tempUpper, cellTempAvg, cellTempRMS);
 
         real P_high = gaussianMonoPDFCalc(tempUpper, cellTempAvg, cellTempRMS);
@@ -370,7 +370,7 @@ DEFINE_SOURCE (temppdf_m_1_C2H2Source,c,t,dS,eqn)
 
         real P_low = gaussianMonoPDFCalc(tempLower, cellTempAvg, cellTempRMS);
 
-        real f_high = pow(tempUpper, n4) / tempLower * exp(-Ea4/(R*tempUpper)) * alpha_high * ChiSoot_high * \
+        real f_high = pow(tempUpper, n4) / tempUpper * exp(-Ea4/(R*tempUpper)) * alpha_high * ChiSoot_high * \
         gaussianMonoPDFCalc(tempUpper, cellTempAvg, cellTempRMS);
 
         real P_high = gaussianMonoPDFCalc(tempUpper, cellTempAvg, cellTempRMS);
@@ -395,7 +395,6 @@ DEFINE_SOURCE (temppdf_m_1_C2H2Source,c,t,dS,eqn)
         
     }
 
-    C_UDMI(c,t,33) = pdfIntegrand;
     
 
     source = multConstant * integrand;
@@ -785,7 +784,7 @@ DEFINE_SOURCE (temppdf_m_2_C2H2Source,c,t,dS,eqn)
 
         real P_low = gaussianMonoPDFCalc(tempLower, cellTempAvg, cellTempRMS);
 
-        real f_high = pow(tempUpper, n4) / tempLower * exp(-Ea4/(R*tempUpper)) * alpha_high * ChiSoot_high * \
+        real f_high = pow(tempUpper, n4) / tempUpper * exp(-Ea4/(R*tempUpper)) * alpha_high * ChiSoot_high * \
         gaussianMonoPDFCalc(tempUpper, cellTempAvg, cellTempRMS);
 
         real P_high = gaussianMonoPDFCalc(tempUpper, cellTempAvg, cellTempRMS);
@@ -810,7 +809,8 @@ DEFINE_SOURCE (temppdf_m_2_C2H2Source,c,t,dS,eqn)
         
     }
 
-    C_UDMI(c,t,33) = pdfIntegrand;
+    real chiSoot = pdfChiSootCalc(cellTempAvg, cellPressure, RGas, HMf, OHMf, H2Mf, H2OMf, C2H2MfAvg, O2Mf);
+    C_UDMI(c,t,11) = chiSoot;
     
 
     source = multConstant * integrand;
