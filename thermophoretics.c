@@ -88,7 +88,7 @@ DEFINE_SOURCE(m_0_WallThermophoretic,c,t,dS,eqn)
     }
 
     source = -cellM0 * faceArea * Vt / (C_VOLUME(c,t) * 2 * pi);
-    C_UDMI(c,t,44) = source;
+    C_UDMI(c,t,43) = source;
     return source;
 }
 
@@ -178,7 +178,7 @@ DEFINE_SOURCE(m_1_WallThermophoretic,c,t,dS,eqn)
     }
 
     source = -cellM1 * faceArea * Vt / (C_VOLUME(c,t) * 2 * pi);
-    C_UDMI(c,t,43) = source;
+    C_UDMI(c,t,44) = source;
     return source;
 }
 

@@ -918,17 +918,6 @@ DEFINE_SOURCE(pdf_m_1_OxSource_alphaOxPDF,c,t,dS,eqn)
         integrandO2 = 1 / cellTempAvg * exp(-Ea5/(R*cellTempAvg)) * alpha * chiSoot;
         pdfIntegrandO2 = 1.0;
 
-        C_UDMI(c,t,50) = 0.0;
-        C_UDMI(c,t,51) = 0.0;
-        C_UDMI(c,t,52) = 0.0;
-        C_UDMI(c,t,53) = 0.0;
-        C_UDMI(c,t,54) = 0.0;
-        C_UDMI(c,t,55) = 0.0;
-        C_UDMI(c,t,56) = 0.0;
-        C_UDMI(c,t,57) = 0.0;
-        C_UDMI(c,t,58) = 0.0;
-        C_UDMI(c,t,59) = 0.0;
-        C_UDMI(c,t,60) = 0.0;
 
     }
 
