@@ -55,7 +55,7 @@ real s_calc(real temp, real tempmid, real ah1, real ah2, real ah3, real ah4, rea
 
 real gibbs_calc(int rxn, real temp);
 
-DEFINE_SOURCE(CA-H,c,t,dS,eqn)
+DEFINE_SOURCE(CAH,c,t,dS,eqn)
 {
 	real cellTemp = C_T(c,t);
 	real cellRho = C_R(c,t) * 1e-3; /* in g/cc */
@@ -137,7 +137,7 @@ DEFINE_SOURCE(CA-H,c,t,dS,eqn)
 
 }
 
-DEFINE_SOURCE(CA-rad,c,t,dS,eqn)
+DEFINE_SOURCE(CArad,c,t,dS,eqn)
 {
 	real cellTemp = C_T(c,t);
 	real cellRho = C_R(c,t) * 1e-3; /* in g/cc */
@@ -197,7 +197,7 @@ DEFINE_SOURCE(CA-rad,c,t,dS,eqn)
 	return source_reac;
 }
 
-DEFINE_SOURCE(CA-O,c,t,dS,eqn)
+DEFINE_SOURCE(CAO,c,t,dS,eqn)
 {
 	real cellTemp = C_T(c,t);
 	real cellRho = C_R(c,t) * 1e-3; /* in g/cc */
@@ -276,7 +276,7 @@ DEFINE_SOURCE(CR5,c,t,dS,eqn)
 	return source_reac;
 }
 
-DEFINE_SOURCE(CZ-H,c,t,dS,eqn)
+DEFINE_SOURCE(CZH,c,t,dS,eqn)
 {
 	real cellTemp = C_T(c,t);
 	real cellRho = C_R(c,t) * 1e-6; /* in g/cc */
@@ -334,7 +334,7 @@ DEFINE_SOURCE(CZ-H,c,t,dS,eqn)
 	return source;
 }
 
-DEFINE_SOURCE(CZ-rad,c,t,dS,eqn)
+DEFINE_SOURCE(CZrad,c,t,dS,eqn)
 {
 	real cellTemp = C_T(c,t);
 	real cellRho = C_R(c,t) * 1e-6; /* in g/cc */
