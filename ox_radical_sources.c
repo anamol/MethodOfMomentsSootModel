@@ -131,6 +131,8 @@ DEFINE_SOURCE(CA-H,c,t,dS,eqn)
 
 	real source = source_reac + nuc_term;
 
+	dS[eqn] = -k1f - k2r - k5f - k7f  ;
+
 	return source;
 
 }
@@ -189,6 +191,10 @@ DEFINE_SOURCE(CA-rad,c,t,dS,eqn)
 
 	real source_reac = k1f * CAHMc - k1r * CAradMc - k2f * CAradMc + k2r * CAHMc - k3f * CAradMc 
 		+ k3r * CAOMc + k5f * CAHMc - k5r * CAradMC - k6 * CAradMc;
+
+	dS[eqn] = - k1r - k2f - k3f - k5r - k6;
+
+	return source_reac;
 }
 
 DEFINE_SOURCE(CA-O,c,t,dS,eqn)
@@ -227,6 +233,10 @@ DEFINE_SOURCE(CA-O,c,t,dS,eqn)
 	real k7r = k7f/Keq7;
 
 	real source_reac = k3f * CAradMc - k3r * CAOMc - k4 * CAOradMc + k7 * CAHMc - k7r * CAOMc;
+
+	dS[eqn] = -k3r - k4 - k7r;
+
+	return source_reac;
 }
 
 DEFINE_SOURCE(CR5,c,t,dS,eqn)
@@ -260,6 +270,10 @@ DEFINE_SOURCE(CR5,c,t,dS,eqn)
 	real k8 = S8A * pow(cellTemp, S8n) * exp(-S8Ea/cellTemp) * OMc;
 
 	real source_reac = k4 * CAOMc + k6 * CAradMc - k8 * CR5Mc -  1/2 * (k4 * CAOMc + k6 * CAradMc + k8 * CR5Mc);
+
+	dS[eqn] = - k8 - 1/2 * k8;
+
+	return source_reac;
 }
 
 DEFINE_SOURCE(CZ-H,c,t,dS,eqn)
@@ -314,6 +328,10 @@ DEFINE_SOURCE(CZ-H,c,t,dS,eqn)
 	real nuc_term = C_UDMI(c,t,0) * 1e-6 * (1 - 2 * alpha_o) * (2 * NPyr); 
 
 	real source = source_reac + nuc_term;
+
+	dS[eqn] = -k10f - k11r;
+
+	return source;
 }
 
 DEFINE_SOURCE(CZ-rad,c,t,dS,eqn)
@@ -350,6 +368,10 @@ DEFINE_SOURCE(CZ-rad,c,t,dS,eqn)
 	real k11r = k11f/Keq11;
 
 	real source_reac = k10f * CZHMc - k10r * CZradMc - k11f * CZradMc + k11r * CZHMc;
+
+	dS[eqn] = -k10r - k11f;
+
+	return source_reac;
 }
 
 DEFINE_EXECUTE_AT_END(add_source_terms)
