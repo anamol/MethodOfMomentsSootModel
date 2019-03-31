@@ -45,9 +45,27 @@
 #define S16A 2.0e14
 #define S16Ea 2670.0
 
+#define alpha_o 0.35
+
+real h_calc(real temp, real tempmid, real ah1, real ah2, real ah3, real ah4, real ah5, real ah6, 
+	real ah7, real al1, real al2, real al3, real al4, real al5, real al6, real al7);
+
+real s_calc(real temp, real tempmid, real ah1, real ah2, real ah3, real ah4, real ah5, real ah6, 
+	real ah7, real al1, real al2, real al3, real al4, real al5, real al6, real al7);
+
+real gibbs_calc(int rxn, real temp);
+
 DEFINE_SOURCE(CA-H,c,t,dS,eqn)
 {
 	real cellTemp = C_T(c,t);
+	real cellRho = C_R(c,t) * 1e-3; /* in g/cc */
+
+	CAHMc = UDSI(c,t,3) * C_R(c,t) * 1e-6;
+	CAradMc = UDSI(c,t,4) * C_R(c,t) * 1e-6;
+	CAOMc = UDSI(c,t,5) * C_R(c,t) * 1e-6;
+	CR5Mc = UDSI(c,t,6) * C_R(c,t) * 1e-6;
+	CZHMc = UDSI(c,t,7) * C_R(c,t) * 1e-6;
+	CZrad = UDSI(c,t,8) * C_R(c,t) * 1e-6;
 
 	Material *mat1 = THREAD_MATERIAL(t);
 
@@ -71,23 +89,28 @@ DEFINE_SOURCE(CA-H,c,t,dS,eqn)
     real H2Mf = Pdf_Yi(c,t,idH2);
     real H2Mc = H2Mf*cellRho/H2MW;
 
-    real M0 = C_UDSI(c,t,0) * C_R(c,t); 
-    real M1 = C_UDSI(c,t,1) * C_R(c,t);
-    real M2 = C_UDSI(c,t,2) * C_R(c,t);
+    real M0 = C_UDSI(c,t,0) * C_R(c,t) / 1e6;   /* Conv				*/
+    real M1 = C_UDSI(c,t,1) * C_R(c,t) / 1e6;	/*     to 			*/
+    real M2 = C_UDSI(c,t,2) * C_R(c,t) / 1e6;	/*		 /cm^3  	*/
+    real Mtwothirds = fractionalMoments(twoThird, M0, M1, M2) * M0;
 
-	delZ = 0.0;
-	delA = 0.0;
+    real A = CAHMc + CAradMc +CAOMc + CR5Mc;
+	real Z = CZHMc + CZradMc;
 
-	real M0_dot = C_UDMI(c,t,50);
-	real M1_dot = C_UDMI(c,t,51);
-	real M2_dot = C_UDMI(c,t,52);
-	real Mtwothirds_dot = -7.0/9.0 * pow(M0, -16.0/9.0) * pow(M1, 8.0/9.0) * pow(M2, -1.0/9.0) * M0_dot
-		+ 8.0/9.0 * pow(M0, -7.0/9.0) * pow(M1, -1.0/9.0) * pow(M2, -1.0/9.0) * M1_dot
-		- 1.0/9.0 * pow(M0, -7.0/9.0) * pow(M1, 8.0/9.0) * pow(M2, -10.0/9.0) * M2_dot;
+	real surfArea = pi * pow(6 * mC * 1e3/(pi * rhoSoot * 1e-3), twoThird) * Mtwothirds;
+	real chi_nominal = siteDensity * 1e-4 / (avogad * 1e-3) * surfArea;
 
+	real alpha = (A + Z)/chi_nominal;
+
+	real M0_dot = C_UDMI(c,t,50) / 1e6;
+	real M1_dot = C_UDMI(c,t,51) / 1e6;
+	real M2_dot = C_UDMI(c,t,52) / 1e6;
+	real Mtwothirds_dot = 2.0/9.0 * pow(M0, -7.0/9.0) * pow(M1, 8.0/9.0) * pow(M2, -1.0/9.0) * M0_dot
+		+ 8.0/9.0 * pow(M0, 2.0/9.0) * pow(M1, -1.0/9.0) * pow(M2, -1.0/9.0) * M1_dot
+		- 1.0/9.0 * pow(M0, 2.0/9.0) * pow(M1, 8.0/9.0) * pow(M2, -10.0/9.0) * M2_dot;
 
 	real k1f = S1Af * pow(cellTemp, S1nf) * exp(-S1Eaf/cellTemp) * HMc;
-	real k1r = S1A * pow(cellTemp, S1nr) * exp(-S1Ear/cellTemp) * H2Mc;
+	real k1r = S1Ar * pow(cellTemp, S1nr) * exp(-S1Ear/cellTemp) * H2Mc;
 	real k2f = S2A * pow(cellTemp, S2n) * HMc;
 	real Keq2 = exp(-gibbs_calc(2, cellTemp)/(R * cellTemp));
 	real k2r = k2f/Keq2;
@@ -100,16 +123,29 @@ DEFINE_SOURCE(CA-H,c,t,dS,eqn)
 	real k7r = k7f/Keq7;
 	real k8 = S8A * pow(cellTemp, S8n) * exp(-S8Ea/cellTemp) * OMc;
 
-	real source_reac = -k1f * CAHMc + k1r * CAradMc + k2f * CAradMc - k2r * CAHMc - k5f * CAHMc 
-		+ k5r * CAradMc - k7f * CAHMc + k7r * CAOMc + k8 * delA * CR5Mc + 1/2 * delA * (k4 * CaOMc + k6 * CAradMc + k8 * CR5Mc);
+	real source_reac = -k1f * CAHMc + k1r * CAradMc + k2f * CAradMc - k2r * CAHMc - k5f * CAHMc + k5r * CAradMc 
+		- k7f * CAHMc + k7r * CAOMc + 2 * (k8 * CR5Mc + 1/2 * (k4 * CAOMc + k6 * CAradMc + k8 * CR5Mc)) 
+		- 2 * pow(alpha, 2) *  chi_nominal * Mtwothirds_dot / Mtwothirds;
 
-	real nuc_term = 0.0;
+	real nuc_term = C_UDMI(c,t,0) * 1e-6 * alpha_o * (2 * NPyr);
+
+	real source = source_reac + nuc_term;
+
+	return source;
 
 }
 
 DEFINE_SOURCE(CA-rad,c,t,dS,eqn)
 {
 	real cellTemp = C_T(c,t);
+	real cellRho = C_R(c,t) * 1e-3; /* in g/cc */
+
+	CAHMc = UDSI(c,t,3) * C_R(c,t) * 1e-6;
+	CAradMc = UDSI(c,t,4) * C_R(c,t) * 1e-6;
+	CAOMc = UDSI(c,t,5) * C_R(c,t) * 1e-6;
+	CR5Mc = UDSI(c,t,6) * C_R(c,t) * 1e-6;
+	CZHMc = UDSI(c,t,7) * C_R(c,t) * 1e-6;
+	CZrad = UDSI(c,t,8) * C_R(c,t) * 1e-6;
 
 	Material *mat1 = THREAD_MATERIAL(t);
 
@@ -133,8 +169,13 @@ DEFINE_SOURCE(CA-rad,c,t,dS,eqn)
     real H2Mf = Pdf_Yi(c,t,idH2);
     real H2Mc = H2Mf*cellRho/H2MW;
 
+    real M0 = C_UDSI(c,t,0) * C_R(c,t) / 1e6;   /* Conv				*/
+    real M1 = C_UDSI(c,t,1) * C_R(c,t) / 1e6;	/*     to 			*/
+    real M2 = C_UDSI(c,t,2) * C_R(c,t) / 1e6;	/*		 /cm^3  	*/
+    real Mtwothirds = fractionalMoments(twoThird, M0, M1, M2) * M0;
+
 	real k1f = S1Af * pow(cellTemp, S1nf) * exp(-S1Eaf/cellTemp) * HMc;
-	real k1r = S1A * pow(cellTemp, S1nr) * exp(-S1Ear/cellTemp) * H2Mc;
+	real k1r = S1Ar * pow(cellTemp, S1nr) * exp(-S1Ear/cellTemp) * H2Mc;
 	real k2f = S2A * pow(cellTemp, S2n) * HMc;
 	real Keq2 = exp(-gibbs_calc(2, cellTemp)/(R * cellTemp));
 	real k2r = k2f/Keq2;
@@ -153,6 +194,14 @@ DEFINE_SOURCE(CA-rad,c,t,dS,eqn)
 DEFINE_SOURCE(CA-O,c,t,dS,eqn)
 {
 	real cellTemp = C_T(c,t);
+	real cellRho = C_R(c,t) * 1e-3; /* in g/cc */
+
+	CAHMc = UDSI(c,t,3) * C_R(c,t) * 1e-6;
+	CAradMc = UDSI(c,t,4) * C_R(c,t) * 1e-6;
+	CAOMc = UDSI(c,t,5) * C_R(c,t) * 1e-6;
+	CR5Mc = UDSI(c,t,6) * C_R(c,t) * 1e-6;
+	CZHMc = UDSI(c,t,7) * C_R(c,t) * 1e-6;
+	CZrad = UDSI(c,t,8) * C_R(c,t) * 1e-6;
 
 	Material *mat1 = THREAD_MATERIAL(t);
 
@@ -164,6 +213,11 @@ DEFINE_SOURCE(CA-O,c,t,dS,eqn)
     real HMf = Pdf_Yi(c,t,idH);
     real HMc = HMf*cellRho/HMW;
 
+    real M0 = C_UDSI(c,t,0) * C_R(c,t) / 1e6;   /* Conv				*/
+    real M1 = C_UDSI(c,t,1) * C_R(c,t) / 1e6;	/*     to 			*/
+    real M2 = C_UDSI(c,t,2) * C_R(c,t) / 1e6;	/*		 /cm^3  	*/
+    real Mtwothirds = fractionalMoments(twoThird, M0, M1, M2) * M0;
+
 	real k3f = S3A * exp(-S3Ea/cellTemp) * HMc;
 	real Keq3 = exp(-gibbs_calc(3, cellTemp)/(R * cellTemp));
 	real k3r = k3f/Keq3;
@@ -172,12 +226,20 @@ DEFINE_SOURCE(CA-O,c,t,dS,eqn)
 	real Keq7 = exp(-gibbs_calc(7, cellTemp)/(R*cellTemp));
 	real k7r = k7f/Keq7;
 
-	real source_reac = k3f * CAradMc - k3r * CAOMc - k4 * CAOradMc + k7 * CAHMc - k7r * CaOMc;
+	real source_reac = k3f * CAradMc - k3r * CAOMc - k4 * CAOradMc + k7 * CAHMc - k7r * CAOMc;
 }
 
 DEFINE_SOURCE(CR5,c,t,dS,eqn)
 {
 	real cellTemp = C_T(c,t);
+	real cellRho = C_R(c,t) * 1e-6; /* in g/cc */
+
+	CAHMc = UDSI(c,t,3) * C_R(c,t) * 1e-6;
+	CAradMc = UDSI(c,t,4) * C_R(c,t) * 1e-6;
+	CAOMc = UDSI(c,t,5) * C_R(c,t) * 1e-6;
+	CR5Mc = UDSI(c,t,6) * C_R(c,t) * 1e-6;
+	CZHMc = UDSI(c,t,7) * C_R(c,t) * 1e-6;
+	CZrad = UDSI(c,t,8) * C_R(c,t) * 1e-6;
 
 	Material *mat1 = THREAD_MATERIAL(t);
 
@@ -189,16 +251,28 @@ DEFINE_SOURCE(CR5,c,t,dS,eqn)
     real OMf = Pdf_Yi(c,t,idO);
     real OMc = OMf*cellRho/OMW;
 
+    real M0 = C_UDSI(c,t,0) * C_R(c,t) / 1e6;   /* Conv				*/
+    real M1 = C_UDSI(c,t,1) * C_R(c,t) / 1e6;	/*     to 			*/
+    real M2 = C_UDSI(c,t,2) * C_R(c,t) / 1e6;	/*		 /cm^3  	*/
+
 	real k4 = S4A * pow(cellTemp, S4n) * exp(-S4Ea/cellTemp);
 	real k6 = S6A * OHMc;
 	real k8 = S8A * pow(cellTemp, S8n) * exp(-S8Ea/cellTemp) * OMc;
 
-	real source_reac = k4 * CaOMc + k6 * CAradMc - k8 * CR5Mc -  1/2 * (k4 * CaOMc + k6 * CAradMc + k8 * CR5Mc);
+	real source_reac = k4 * CAOMc + k6 * CAradMc - k8 * CR5Mc -  1/2 * (k4 * CAOMc + k6 * CAradMc + k8 * CR5Mc);
 }
 
 DEFINE_SOURCE(CZ-H,c,t,dS,eqn)
 {
 	real cellTemp = C_T(c,t);
+	real cellRho = C_R(c,t) * 1e-6; /* in g/cc */
+
+	CAHMc = UDSI(c,t,3) * C_R(c,t) * 1e-6;
+	CAradMc = UDSI(c,t,4) * C_R(c,t) * 1e-6;
+	CAOMc = UDSI(c,t,5) * C_R(c,t) * 1e-6;
+	CR5Mc = UDSI(c,t,6) * C_R(c,t) * 1e-6;
+	CZHMc = UDSI(c,t,7) * C_R(c,t) * 1e-6;
+	CZrad = UDSI(c,t,8) * C_R(c,t) * 1e-6;
 
 	Material *mat1 = THREAD_MATERIAL(t);
 
@@ -210,8 +284,22 @@ DEFINE_SOURCE(CZ-H,c,t,dS,eqn)
     real H2Mf = Pdf_Yi(c,t,idH2);
     real H2Mc = H2Mf*cellRho/H2MW;
 
-    delZ = 0.0;
-	delA = 0.0;
+    real M0 = C_UDSI(c,t,0) * C_R(c,t) / 1e6;   /* Conv				*/
+    real M1 = C_UDSI(c,t,1) * C_R(c,t) / 1e6;	/*     to 			*/
+    real M2 = C_UDSI(c,t,2) * C_R(c,t) / 1e6;	/*		 /cm^3  	*/
+    real Mtwothirds = fractionalMoments(twoThird, M0, M1, M2) * M0; 
+
+    real Mtwothirds_dot = 2.0/9.0 * pow(M0, -7.0/9.0) * pow(M1, 8.0/9.0) * pow(M2, -1.0/9.0) * M0_dot
+		+ 8.0/9.0 * pow(M0, 2.0/9.0) * pow(M1, -1.0/9.0) * pow(M2, -1.0/9.0) * M1_dot
+		- 1.0/9.0 * pow(M0, 2.0/9.0) * pow(M1, 8.0/9.0) * pow(M2, -10.0/9.0) * M2_dot;
+
+	real A = CAHMc + CAradMc +CAOMc + CR5Mc;
+	real Z = CZHMc + CZradMc;
+
+	real surfArea = pi * pow(6 * mC * 1e3/(pi * rhoSoot * 1e-3), twoThird) * Mtwothirds;
+	real chi_nominal = siteDensity * 1e-4 / (avogad * 1e-3) * surfArea;
+
+	real alpha = (A + Z)/chi_nominal;
 
 	real k8 = S8A * pow(cellTemp, S8n) * exp(-S8Ea/cellTemp) * OMc;
 	real k10f = S10Af * pow(cellTemp, S10nf) * exp(-S10Eaf/cellTemp) * HMc;
@@ -220,13 +308,25 @@ DEFINE_SOURCE(CZ-H,c,t,dS,eqn)
 	real Keq11 = exp(-gibbs_calc(11, cellTemp)/(R*cellTemp));
 	real k11r = k11f/Keq11;
 
-	real source_reac = delZ * k8 * CR5Mc + 1/2 * delZ * (k4 * CaOMc + k6 * CAradMc + k8 * CR5Mc) 
+	real source_reac = 2 * pow(alpha, 2) *  chi_nominal * Mtwothirds_dot / Mtwothirds
 		- k10f * CZHMc + k10r * CZradMc + k11f * CZradMc - k11r * CZHMc;
+
+	real nuc_term = C_UDMI(c,t,0) * 1e-6 * (1 - 2 * alpha_o) * (2 * NPyr); 
+
+	real source = source_reac + nuc_term;
 }
 
 DEFINE_SOURCE(CZ-rad,c,t,dS,eqn)
 {
 	real cellTemp = C_T(c,t);
+	real cellRho = C_R(c,t) * 1e-6; /* in g/cc */
+
+	CAHMc = UDSI(c,t,3) * C_R(c,t) * 1e-6;
+	CAradMc = UDSI(c,t,4) * C_R(c,t) * 1e-6;
+	CAOMc = UDSI(c,t,5) * C_R(c,t) * 1e-6;
+	CR5Mc = UDSI(c,t,6) * C_R(c,t) * 1e-6;
+	CZHMc = UDSI(c,t,7) * C_R(c,t) * 1e-6;
+	CZrad = UDSI(c,t,8) * C_R(c,t) * 1e-6;
 
 	Material *mat1 = THREAD_MATERIAL(t);
 
@@ -237,6 +337,11 @@ DEFINE_SOURCE(CZ-rad,c,t,dS,eqn)
     int idH2 = mixture_specie_index(mat1, "h2");
     real H2Mf = Pdf_Yi(c,t,idH2);
     real H2Mc = H2Mf*cellRho/H2MW;
+
+    real M0 = C_UDSI(c,t,0) * C_R(c,t) / 1e6;   /* Conv				*/
+    real M1 = C_UDSI(c,t,1) * C_R(c,t) / 1e6;	/*     to 			*/
+    real M2 = C_UDSI(c,t,2) * C_R(c,t) / 1e6;	/*		 /cm^3  	*/
+    real Mtwothirds = fractionalMoments(twoThird, M0, M1, M2) * M0; 
 
 	real k10f = S10Af * pow(cellTemp, S10nf) * exp(-S10Eaf/cellTemp) * HMc;
 	real k10r = S10Ar * pow(cellTemp, S10nr) * exp(-S10Ear/cellTemp) * H2Mc;
@@ -264,11 +369,32 @@ DEFINE_EXECUTE_AT_END(add_source_terms)
 			/*					nuc 	+		c2h2		+	oxid 		+	thermoph 	*/			
 			C_UDMI(c,t,52) = C_UDMI(c,t,2) + C_UDMI(c,t,4) + C_UDMI(c,t,10) + C_UDMI(c,t,18) + C_UDMI(c,t,45);
 			/*					nuc 	+		c2h2		+	oxid 		+	coag		+	thermoph 	*/	
+
+			CAHMc = UDSI(c,t,3) * C_R(c,t) * 1e-6;
+			CAradMc = UDSI(c,t,4) * C_R(c,t) * 1e-6;
+			CAOMc = UDSI(c,t,5) * C_R(c,t) * 1e-6;
+			CR5Mc = UDSI(c,t,6) * C_R(c,t) * 1e-6;
+			CZHMc = UDSI(c,t,7) * C_R(c,t) * 1e-6;
+			CZrad = UDSI(c,t,8) * C_R(c,t) * 1e-6;
+
+			real M0 = C_UDSI(c,t,0) * C_R(c,t) / 1e6;   /* Conv				*/
+    		real M1 = C_UDSI(c,t,1) * C_R(c,t) / 1e6;	/*     to 			*/
+    		real M2 = C_UDSI(c,t,2) * C_R(c,t) / 1e6;	/*		 /cm^3  	*/
+    		real Mtwothirds = fractionalMoments(twoThird, M0, M1, M2) * M0;
+
+    		real A = CAHMc + CAradMc +CAOMc + CR5Mc;
+			real Z = CZHMc + CZradMc;
+
+			real surfArea = pi * pow(6 * mC * 1e3/(pi * rhoSoot * 1e-3), twoThird) * Mtwothirds;
+			real chi_nominal = siteDensity * 1e-4 / (avogad * 1e-3) * surfArea;
+
+			real alpha = (A + Z)/chi_nominal;
+			C_UDMI(c,t,53) = alpha;
 		}
 	}
 }
 
-real gibbs_calc(rxn, temp)
+real gibbs_calc(int rxn, real temp)
 /* returns gibbs energy change in J/mol */
 {
 	real gibbs = 0.0;
@@ -430,7 +556,8 @@ real gibbs_calc(rxn, temp)
 
 }
 
-real h_calc(temp, tempmid, ah1, ah2, ah3, ah4, ah5, ah6, ah7, al1, al2, al3, al4, al5, al6, al7)
+real h_calc(real temp, real tempmid, real ah1, real ah2, real ah3, real ah4, real ah5, real ah6, 
+	real ah7, real al1, real al2, real al3, real al4, real al5, real al6, real al7)
 {
 	real h = 0.0;
 	if (temp > tempmid)
@@ -446,7 +573,8 @@ real h_calc(temp, tempmid, ah1, ah2, ah3, ah4, ah5, ah6, ah7, al1, al2, al3, al4
 	return h;
 }
 
-real s_calc(temp, tempmid, ah1, ah2, ah3, ah4, ah5, ah6, ah7, al1, al2, al3, al4, al5, al6, al7)
+real s_calc(real temp, real tempmid, real ah1, real ah2, real ah3, real ah4, real ah5, real ah6, 
+	real ah7, real al1, real al2, real al3, real al4, real al5, real al6, real al7)
 {
 	real s = 0.0;
 	if (temp > tempmid)
