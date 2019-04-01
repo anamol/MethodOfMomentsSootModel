@@ -191,7 +191,7 @@ DEFINE_SOURCE(CArad,c,t,dS,eqn)
 	real k6 = S6A * OHMc;
 
 	real source_reac = k1f * CAHMc - k1r * CAradMc - k2f * CAradMc + k2r * CAHMc - k3f * CAradMc 
-		+ k3r * CAOMc + k5f * CAHMc - k5r * CAradMC - k6 * CAradMc;
+		+ k3r * CAOMc + k5f * CAHMc - k5r * CAradMc - k6 * CAradMc;
 
 	dS[eqn] = - k1r - k2f - k3f - k5r - k6;
 
@@ -433,154 +433,164 @@ real gibbs_calc(int rxn, real temp)
 	switch(rxn) {
 		case 2: /* CA* + H <=> CAH  
 				    a  + b <=>  c    */
-		real ah1 = 3.29950506E+00, real ah2 = 6.30133365E-02, real ah3 = -3.79760083E-05, real ah4 = 1.08180756E-08, real ah5 = -1.18007697E-12;
-		real ah6 = 4.47516414E+04, real ah7 = 5.41223132E+00, real al1 = -8.00768796E+00, real al2 = 1.03041289E-01, real al3 = -8.38190998E-05;
-		real al4 = 2.76491726E-08, real al5 = -8.88842209E-13, real al6 = 4.70598674E+04, real al7 = 6.07299723E+01, real al8 = 2.10265738E+04;
-		real a_tempmid = 1000;
-		real aH = h_calc(temp, a_tempmid, ah1, ah2, ah3, ah4, ah5, ah6, ah7, al1, al2, al3, al4, al5, al6, al7);
-		real aS = s_calc(temp, a_tempmid, ah1, ah2, ah3, ah4, ah5, ah6, ah7, al1, al2, al3, al4, al5, al6, al7);
+		{
+			real ah1 = 3.29950506E+00, real ah2 = 6.30133365E-02, real ah3 = -3.79760083E-05, real ah4 = 1.08180756E-08, real ah5 = -1.18007697E-12;
+			real ah6 = 4.47516414E+04, real ah7 = 5.41223132E+00, real al1 = -8.00768796E+00, real al2 = 1.03041289E-01, real al3 = -8.38190998E-05;
+			real al4 = 2.76491726E-08, real al5 = -8.88842209E-13, real al6 = 4.70598674E+04, real al7 = 6.07299723E+01, real al8 = 2.10265738E+04;
+			real a_tempmid = 1000;
+			real aH = h_calc(temp, a_tempmid, ah1, ah2, ah3, ah4, ah5, ah6, ah7, al1, al2, al3, al4, al5, al6, al7);
+			real aS = s_calc(temp, a_tempmid, ah1, ah2, ah3, ah4, ah5, ah6, ah7, al1, al2, al3, al4, al5, al6, al7);
 
-		real bh1 = 0.25000000E+01, real bh2 = 0.00000000E+00, real bh3 = 0.00000000E+00, real bh4 = 0.00000000E+00, real bh5 = 0.00000000E+00;
- 		real bh6 = 0.25473660E+05, real bh7 = -0.44668285E+00, real bl1 = 0.25000000E+01, real bl2 = 0.00000000E+00, real bl3 = 0.00000000E+00;
- 		real bl4 = 0.00000000E+00, real bl5 = 0.00000000E+00, real bl6 = 0.25473660E+05, real bl7 = -0.44668285E+00, real bl8 = 0.26219035E+05;
- 		real b_tempmid = 1000;
- 		real bH = h_calc(temp, b_tempmid, bh1, bh2, bh3, bh4, bh5, bh6, bh7, bl1, bl2, bl3, bl4, bl5, bl6, bl7);
-		real bS = s_calc(temp, b_tempmid, bh1, bh2, bh3, bh4, bh5, bh6, bh7, bl1, bl2, bl3, bl4, bl5, bl6, bl7);
+			real bh1 = 0.25000000E+01, real bh2 = 0.00000000E+00, real bh3 = 0.00000000E+00, real bh4 = 0.00000000E+00, real bh5 = 0.00000000E+00;
+	 		real bh6 = 0.25473660E+05, real bh7 = -0.44668285E+00, real bl1 = 0.25000000E+01, real bl2 = 0.00000000E+00, real bl3 = 0.00000000E+00;
+	 		real bl4 = 0.00000000E+00, real bl5 = 0.00000000E+00, real bl6 = 0.25473660E+05, real bl7 = -0.44668285E+00, real bl8 = 0.26219035E+05;
+	 		real b_tempmid = 1000;
+	 		real bH = h_calc(temp, b_tempmid, bh1, bh2, bh3, bh4, bh5, bh6, bh7, bl1, bl2, bl3, bl4, bl5, bl6, bl7);
+			real bS = s_calc(temp, b_tempmid, bh1, bh2, bh3, bh4, bh5, bh6, bh7, bl1, bl2, bl3, bl4, bl5, bl6, bl7);
 
- 		real ch1 = 1.76826275E+00, real ch2 = 6.89143506E-02, real ch3 = -4.14322176E-05, real ch4 = 1.17914309E-08, real ch5 = -1.28597061E-12;
-		real ch6 = 1.45412795E+04, real ch7 = 1.06257927E+01, real cl1 = -8.72434585E+00, real cl2 =  1.05376008E-01, real cl3 = -8.01710690E-05;
-		real cl4 = 2.18545974E-08, real cl5 =  1.42066606E-12, real cl6 =  1.66588912E+04, real cl7 = 6.19828860E+01, real cl8 = 2.10522087E+04;
-		real c_tempmid = 1000;
-		real cH = h_calc(temp, c_tempmid, ch1, ch2, ch3, ch4, ch5, ch6, ch7, cl1, cl2, cl3, cl4, cl5, cl6, cl7);
-		real cS = s_calc(temp, c_tempmid, ch1, ch2, ch3, ch4, ch5, ch6, ch7, cl1, cl2, cl3, cl4, cl5, cl6, cl7);
+	 		real ch1 = 1.76826275E+00, real ch2 = 6.89143506E-02, real ch3 = -4.14322176E-05, real ch4 = 1.17914309E-08, real ch5 = -1.28597061E-12;
+			real ch6 = 1.45412795E+04, real ch7 = 1.06257927E+01, real cl1 = -8.72434585E+00, real cl2 =  1.05376008E-01, real cl3 = -8.01710690E-05;
+			real cl4 = 2.18545974E-08, real cl5 =  1.42066606E-12, real cl6 =  1.66588912E+04, real cl7 = 6.19828860E+01, real cl8 = 2.10522087E+04;
+			real c_tempmid = 1000;
+			real cH = h_calc(temp, c_tempmid, ch1, ch2, ch3, ch4, ch5, ch6, ch7, cl1, cl2, cl3, cl4, cl5, cl6, cl7);
+			real cS = s_calc(temp, c_tempmid, ch1, ch2, ch3, ch4, ch5, ch6, ch7, cl1, cl2, cl3, cl4, cl5, cl6, cl7);
 
-		gibbs = cH - (bH + aH) - temp * (cS - (bS + aS));
-		break;
+			gibbs = cH - (bH + aH) - temp * (cS - (bS + aS));
+			break;
+		}
 
 		case 3: /* CA* + O2 <=> CAO + O 
 				    a  + b  <=>  c  + d   */
-		real ah1 = 3.29950506E+00, real ah2 = 6.30133365E-02, real ah3 = -3.79760083E-05, real ah4 = 1.08180756E-08, real ah5 = -1.18007697E-12;
-		real ah6 = 4.47516414E+04, real ah7 = 5.41223132E+00, real al1 = -8.00768796E+00, real al2 = 1.03041289E-01, real al3 = -8.38190998E-05;
-		real al4 = 2.76491726E-08, real al5 = -8.88842209E-13, real al6 = 4.70598674E+04, real al7 = 6.07299723E+01, real al8 = 2.10265738E+04;
-		real a_tempmid = 1000;
-		real aH = h_calc(temp, a_tempmid, ah1, ah2, ah3, ah4, ah5, ah6, ah7, al1, al2, al3, al4, al5, al6, al7);
-		real aS = s_calc(temp, a_tempmid, ah1, ah2, ah3, ah4, ah5, ah6, ah7, al1, al2, al3, al4, al5, al6, al7);
+		{
+			real ah1 = 3.29950506E+00, real ah2 = 6.30133365E-02, real ah3 = -3.79760083E-05, real ah4 = 1.08180756E-08, real ah5 = -1.18007697E-12;
+			real ah6 = 4.47516414E+04, real ah7 = 5.41223132E+00, real al1 = -8.00768796E+00, real al2 = 1.03041289E-01, real al3 = -8.38190998E-05;
+			real al4 = 2.76491726E-08, real al5 = -8.88842209E-13, real al6 = 4.70598674E+04, real al7 = 6.07299723E+01, real al8 = 2.10265738E+04;
+			real a_tempmid = 1000;
+			real aH = h_calc(temp, a_tempmid, ah1, ah2, ah3, ah4, ah5, ah6, ah7, al1, al2, al3, al4, al5, al6, al7);
+			real aS = s_calc(temp, a_tempmid, ah1, ah2, ah3, ah4, ah5, ah6, ah7, al1, al2, al3, al4, al5, al6, al7);
 
-		real bh1 = 3.66096065E+00, real bh2 = 6.56365811E-04, real bh3 = -1.41149627E-07, real bh4 = 2.05797935E-11, real bh5 =-1.29913436E-15;
-		real bh6 = -1.21597718E+03, real bh7 = 3.41536279E+00, real bl1 = 3.78245636E+00, real bl2 = -2.99673416E-03, real bl3 = 9.84730201E-06;
-		real bl4 = -9.68129509E-09, real bl5 = 3.24372837E-12, real bl6 = -1.06394356E+03, real bl7 = 3.65767573E+00; 
-		real b_tempmid = 1000.0;
-		real bH = h_calc(temp, b_tempmid, bh1, bh2, bh3, bh4, bh5, bh6, bh7, bl1, bl2, bl3, bl4, bl5, bl6, bl7);
-		real bS = s_calc(temp, b_tempmid, bh1, bh2, bh3, bh4, bh5, bh6, bh7, bl1, bl2, bl3, bl4, bl5, bl6, bl7);
+			real bh1 = 3.66096065E+00, real bh2 = 6.56365811E-04, real bh3 = -1.41149627E-07, real bh4 = 2.05797935E-11, real bh5 =-1.29913436E-15;
+			real bh6 = -1.21597718E+03, real bh7 = 3.41536279E+00, real bl1 = 3.78245636E+00, real bl2 = -2.99673416E-03, real bl3 = 9.84730201E-06;
+			real bl4 = -9.68129509E-09, real bl5 = 3.24372837E-12, real bl6 = -1.06394356E+03, real bl7 = 3.65767573E+00; 
+			real b_tempmid = 1000.0;
+			real bH = h_calc(temp, b_tempmid, bh1, bh2, bh3, bh4, bh5, bh6, bh7, bl1, bl2, bl3, bl4, bl5, bl6, bl7);
+			real bS = s_calc(temp, b_tempmid, bh1, bh2, bh3, bh4, bh5, bh6, bh7, bl1, bl2, bl3, bl4, bl5, bl6, bl7);
 
-		real ch1 = 2.10591364E+01, real ch2 = 2.82563070E-02, real ch3 = -1.03328686E-05, real ch4 = 1.68867034E-09, real ch5 = -1.01974767E-13;
-		real ch6 = 4.09143507E+03, real ch7 = -8.84963398E+01, real cl1 = -1.15176448E+00, real cl2 = 6.11354512E-02, real cl3 = 3.20151083E-05; 
-		real cl4 = -9.94285290E-08, real cl5 = 4.79990043E-11, real cl6 = 1.14058756E+04, real cl7 = 3.25584836E+01, real cl8 = 1.38887800E+04;
-		real c_tempmid = 1000.0;
-		real cH = h_calc(temp, c_tempmid, ch1, ch2, ch3, ch4, ch5, ch6, ch7, cl1, cl2, cl3, cl4, cl5, cl6, cl7);
-		real cS = s_calc(temp, c_tempmid, ch1, ch2, ch3, ch4, ch5, ch6, ch7, cl1, cl2, cl3, cl4, cl5, cl6, cl7);
+			real ch1 = 2.10591364E+01, real ch2 = 2.82563070E-02, real ch3 = -1.03328686E-05, real ch4 = 1.68867034E-09, real ch5 = -1.01974767E-13;
+			real ch6 = 4.09143507E+03, real ch7 = -8.84963398E+01, real cl1 = -1.15176448E+00, real cl2 = 6.11354512E-02, real cl3 = 3.20151083E-05; 
+			real cl4 = -9.94285290E-08, real cl5 = 4.79990043E-11, real cl6 = 1.14058756E+04, real cl7 = 3.25584836E+01, real cl8 = 1.38887800E+04;
+			real c_tempmid = 1000.0;
+			real cH = h_calc(temp, c_tempmid, ch1, ch2, ch3, ch4, ch5, ch6, ch7, cl1, cl2, cl3, cl4, cl5, cl6, cl7);
+			real cS = s_calc(temp, c_tempmid, ch1, ch2, ch3, ch4, ch5, ch6, ch7, cl1, cl2, cl3, cl4, cl5, cl6, cl7);
 
- 		real dh1 = 2.54363697E+00, real dh2 = -2.73162486E-05, real dh3 = -4.19029520E-09, real dh4 = 4.95481845E-12, real dh5 = -4.79553694E-16;
- 		real dh6 = 2.92260120E+04, real dh7 = 4.92229457E+00, real dl1 = 3.16826710E+00, real dl2 = -3.27931884E-03, real dl3 = 6.64306396E-06;
-		real dl4 = -6.12806624E-09, real dl5 = 2.11265971E-12, real dl6 = 2.91222592E+04, real dl7 = 2.05193346E+00, real dl8 = 2.99687009E+04;
-		real d_tempmid = 1000.0;
-		real dH = h_calc(temp, d_tempmid, dh1, dh2, dh3, dh4, dh5, dh6, dh7, dl1, dl2, dl3, dl4, dl5, dl6, dl7);
-		real dS = s_calc(temp, d_tempmid, dh1, dh2, dh3, dh4, dh5, dh6, dh7, dl1, dl2, dl3, dl4, dl5, dl6, dl7);
+	 		real dh1 = 2.54363697E+00, real dh2 = -2.73162486E-05, real dh3 = -4.19029520E-09, real dh4 = 4.95481845E-12, real dh5 = -4.79553694E-16;
+	 		real dh6 = 2.92260120E+04, real dh7 = 4.92229457E+00, real dl1 = 3.16826710E+00, real dl2 = -3.27931884E-03, real dl3 = 6.64306396E-06;
+			real dl4 = -6.12806624E-09, real dl5 = 2.11265971E-12, real dl6 = 2.91222592E+04, real dl7 = 2.05193346E+00, real dl8 = 2.99687009E+04;
+			real d_tempmid = 1000.0;
+			real dH = h_calc(temp, d_tempmid, dh1, dh2, dh3, dh4, dh5, dh6, dh7, dl1, dl2, dl3, dl4, dl5, dl6, dl7);
+			real dS = s_calc(temp, d_tempmid, dh1, dh2, dh3, dh4, dh5, dh6, dh7, dl1, dl2, dl3, dl4, dl5, dl6, dl7);
 
-		gibbs = dH + cH - (aH + bH) - temp * (dS + cS - (aS + bS));
-		break;
+			gibbs = dH + cH - (aH + bH) - temp * (dS + cS - (aS + bS));
+			break;
+		}
 
 		case 5: /* CAH + OH <=> CA* + H2O
 				    a  + b  <=>  c  +  d    */
-		real ah1 = 1.76826275E+00, real ah2 = 6.89143506E-02, real ah3 = -4.14322176E-05, real ah4 = 1.17914309E-08, real ah5 = -1.28597061E-12;
-		real ah6 = 1.45412795E+04, real ah7 = 1.06257927E+01, real al1 = -8.72434585E+00, real al2 =  1.05376008E-01, real al3 = -8.01710690E-05;
-		real al4 = 2.18545974E-08, real al5 =  1.42066606E-12, real al6 =  1.66588912E+04, real al7 = 6.19828860E+01, real al8 = 2.10522087E+04;
-		real a_tempmid = 1000.0;
-		real aH = h_calc(temp, a_tempmid, ah1, ah2, ah3, ah4, ah5, ah6, ah7, al1, al2, al3, al4, al5, al6, al7);
-		real aS = s_calc(temp, a_tempmid, ah1, ah2, ah3, ah4, ah5, ah6, ah7, al1, al2, al3, al4, al5, al6, al7);
+		{
+			real ah1 = 1.76826275E+00, real ah2 = 6.89143506E-02, real ah3 = -4.14322176E-05, real ah4 = 1.17914309E-08, real ah5 = -1.28597061E-12;
+			real ah6 = 1.45412795E+04, real ah7 = 1.06257927E+01, real al1 = -8.72434585E+00, real al2 =  1.05376008E-01, real al3 = -8.01710690E-05;
+			real al4 = 2.18545974E-08, real al5 =  1.42066606E-12, real al6 =  1.66588912E+04, real al7 = 6.19828860E+01, real al8 = 2.10522087E+04;
+			real a_tempmid = 1000.0;
+			real aH = h_calc(temp, a_tempmid, ah1, ah2, ah3, ah4, ah5, ah6, ah7, al1, al2, al3, al4, al5, al6, al7);
+			real aS = s_calc(temp, a_tempmid, ah1, ah2, ah3, ah4, ah5, ah6, ah7, al1, al2, al3, al4, al5, al6, al7);
 
- 		real bh1 = 2.83853033E+00, real bh2 = 1.10741289E-03, real bh3 = -2.94000209E-07, real bh4 = 4.20698729E-11, real bh5 = -2.42289890E-15;
- 		real bh6 = 3.69780808E+03, real bh7 = 5.84494652E+00, real bl1 = 3.99198424E+00, real bl2 = -2.40106655E-03, real bl3 = 4.61664033E-06;
-		real bl4 = -3.87916306E-09, real bl5 = 1.36319502E-12, real bl6 = 3.36889836E+03, real bl7 = -1.03998477E-01, real bl8 = 4.48615380E+03;
-		real b_tempmid = 1000.0;
-		real bH = h_calc(temp, b_tempmid, bh1, bh2, bh3, bh4, bh5, bh6, bh7, bl1, bl2, bl3, bl4, bl5, bl6, bl7);
-		real bS = s_calc(temp, b_tempmid, bh1, bh2, bh3, bh4, bh5, bh6, bh7, bl1, bl2, bl3, bl4, bl5, bl6, bl7);
+	 		real bh1 = 2.83853033E+00, real bh2 = 1.10741289E-03, real bh3 = -2.94000209E-07, real bh4 = 4.20698729E-11, real bh5 = -2.42289890E-15;
+	 		real bh6 = 3.69780808E+03, real bh7 = 5.84494652E+00, real bl1 = 3.99198424E+00, real bl2 = -2.40106655E-03, real bl3 = 4.61664033E-06;
+			real bl4 = -3.87916306E-09, real bl5 = 1.36319502E-12, real bl6 = 3.36889836E+03, real bl7 = -1.03998477E-01, real bl8 = 4.48615380E+03;
+			real b_tempmid = 1000.0;
+			real bH = h_calc(temp, b_tempmid, bh1, bh2, bh3, bh4, bh5, bh6, bh7, bl1, bl2, bl3, bl4, bl5, bl6, bl7);
+			real bS = s_calc(temp, b_tempmid, bh1, bh2, bh3, bh4, bh5, bh6, bh7, bl1, bl2, bl3, bl4, bl5, bl6, bl7);
 
-		real ch1 = 3.29950506E+00, real ch2 = 6.30133365E-02, real ch3 = -3.79760083E-05, real ch4 = 1.08180756E-08, real ch5 = -1.18007697E-12;
-		real ch6 = 4.47516414E+04, real ch7 = 5.41223132E+00, real cl1 = -8.00768796E+00, real cl2 = 1.03041289E-01, real cl3 = -8.38190998E-05;
-		real cl4 = 2.76491726E-08, real cl5 = -8.88842209E-13, real cl6 = 4.70598674E+04, real cl7 = 6.07299723E+01, real cl8 = 2.10265738E+04;
-		real c_tempmid = 1000.0;
-		real cH = h_calc(temp, c_tempmid, ch1, ch2, ch3, ch4, ch5, ch6, ch7, cl1, cl2, cl3, cl4, cl5, cl6, cl7);
-		real cS = s_calc(temp, c_tempmid, ch1, ch2, ch3, ch4, ch5, ch6, ch7, cl1, cl2, cl3, cl4, cl5, cl6, cl7);
+			real ch1 = 3.29950506E+00, real ch2 = 6.30133365E-02, real ch3 = -3.79760083E-05, real ch4 = 1.08180756E-08, real ch5 = -1.18007697E-12;
+			real ch6 = 4.47516414E+04, real ch7 = 5.41223132E+00, real cl1 = -8.00768796E+00, real cl2 = 1.03041289E-01, real cl3 = -8.38190998E-05;
+			real cl4 = 2.76491726E-08, real cl5 = -8.88842209E-13, real cl6 = 4.70598674E+04, real cl7 = 6.07299723E+01, real cl8 = 2.10265738E+04;
+			real c_tempmid = 1000.0;
+			real cH = h_calc(temp, c_tempmid, ch1, ch2, ch3, ch4, ch5, ch6, ch7, cl1, cl2, cl3, cl4, cl5, cl6, cl7);
+			real cS = s_calc(temp, c_tempmid, ch1, ch2, ch3, ch4, ch5, ch6, ch7, cl1, cl2, cl3, cl4, cl5, cl6, cl7);
 
-		real dh1 = 0.26770389E+01, real dh2 = 0.29731816E-02, real dh3 = -0.77376889E-06, real dh4 = 0.94433514E-10, real dh5 = -0.42689991E-14;
-		real dh6 = -0.29885894E+05, real dh7 = 0.68825500E+01, real dl1 = 0.41986352E+01, real dl2 = -0.20364017E-02, real dl3 = 0.65203416E-05;
-		real dl4 = -0.54879269E-08, real dl5 = 0.17719680E-11, real dl6 = -0.30293726E+05, real dl7 = -0.84900901E+00, real dl8 =-0.29084817E+05;
-		real d_tempmid = 1000.0;
-		real dH = h_calc(temp, d_tempmid, dh1, dh2, dh3, dh4, dh5, dh6, dh7, dl1, dl2, dl3, dl4, dl5, dl6, dl7);
-		real dS = s_calc(temp, d_tempmid, dh1, dh2, dh3, dh4, dh5, dh6, dh7, dl1, dl2, dl3, dl4, dl5, dl6, dl7);
+			real dh1 = 0.26770389E+01, real dh2 = 0.29731816E-02, real dh3 = -0.77376889E-06, real dh4 = 0.94433514E-10, real dh5 = -0.42689991E-14;
+			real dh6 = -0.29885894E+05, real dh7 = 0.68825500E+01, real dl1 = 0.41986352E+01, real dl2 = -0.20364017E-02, real dl3 = 0.65203416E-05;
+			real dl4 = -0.54879269E-08, real dl5 = 0.17719680E-11, real dl6 = -0.30293726E+05, real dl7 = -0.84900901E+00, real dl8 =-0.29084817E+05;
+			real d_tempmid = 1000.0;
+			real dH = h_calc(temp, d_tempmid, dh1, dh2, dh3, dh4, dh5, dh6, dh7, dl1, dl2, dl3, dl4, dl5, dl6, dl7);
+			real dS = s_calc(temp, d_tempmid, dh1, dh2, dh3, dh4, dh5, dh6, dh7, dl1, dl2, dl3, dl4, dl5, dl6, dl7);
 
-		gibbs = dH + cH - (aH + bH) - temp * (dS + cS - (aS + bS));
-		break;
+			gibbs = dH + cH - (aH + bH) - temp * (dS + cS - (aS + bS));
+			break;
+		}
 
 		case 7: /* CAH + O <=> CAO + OH
 				    a  + b <=>  c  + d    */
-		real ah1 = 1.76826275E+00, real ah2 = 6.89143506E-02, real ah3 = -4.14322176E-05, real ah4 = 1.17914309E-08, real ah5 = -1.28597061E-12;
-		real ah6 = 1.45412795E+04, real ah7 = 1.06257927E+01, real al1 = -8.72434585E+00, real al2 =  1.05376008E-01, real al3 = -8.01710690E-05;
-		real al4 = 2.18545974E-08, real al5 =  1.42066606E-12, real al6 =  1.66588912E+04, real al7 = 6.19828860E+01, real al8 = 2.10522087E+04;
-		real a_tempmid = 1000.0;
-		real aH = h_calc(temp, a_tempmid, ah1, ah2, ah3, ah4, ah5, ah6, ah7, al1, al2, al3, al4, al5, al6, al7);
-		real aS = s_calc(temp, a_tempmid, ah1, ah2, ah3, ah4, ah5, ah6, ah7, al1, al2, al3, al4, al5, al6, al7);
+		{
+			real ah1 = 1.76826275E+00, real ah2 = 6.89143506E-02, real ah3 = -4.14322176E-05, real ah4 = 1.17914309E-08, real ah5 = -1.28597061E-12;
+			real ah6 = 1.45412795E+04, real ah7 = 1.06257927E+01, real al1 = -8.72434585E+00, real al2 =  1.05376008E-01, real al3 = -8.01710690E-05;
+			real al4 = 2.18545974E-08, real al5 =  1.42066606E-12, real al6 =  1.66588912E+04, real al7 = 6.19828860E+01, real al8 = 2.10522087E+04;
+			real a_tempmid = 1000.0;
+			real aH = h_calc(temp, a_tempmid, ah1, ah2, ah3, ah4, ah5, ah6, ah7, al1, al2, al3, al4, al5, al6, al7);
+			real aS = s_calc(temp, a_tempmid, ah1, ah2, ah3, ah4, ah5, ah6, ah7, al1, al2, al3, al4, al5, al6, al7);
 
-		real bh1 = 2.54363697E+00, real bh2 = -2.73162486E-05, real bh3 = -4.19029520E-09, real bh4 = 4.95481845E-12, real bh5 = -4.79553694E-16;
- 		real bh6 = 2.92260120E+04, real bh7 = 4.92229457E+00, real bl1 = 3.16826710E+00, real bl2 = -3.27931884E-03, real bl3 = 6.64306396E-06;
-		real bl4 = -6.12806624E-09, real bl5 = 2.11265971E-12, real bl6 = 2.91222592E+04, real bl7 = 2.05193346E+00, real bl8 = 2.99687009E+04;
-		real b_tempmid = 1000.0;
-		real bH = h_calc(temp, b_tempmid, bh1, bh2, bh3, bh4, bh5, bh6, bh7, bl1, bl2, bl3, bl4, bl5, bl6, bl7);
-		real bS = s_calc(temp, b_tempmid, bh1, bh2, bh3, bh4, bh5, bh6, bh7, bl1, bl2, bl3, bl4, bl5, bl6, bl7);
+			real bh1 = 2.54363697E+00, real bh2 = -2.73162486E-05, real bh3 = -4.19029520E-09, real bh4 = 4.95481845E-12, real bh5 = -4.79553694E-16;
+	 		real bh6 = 2.92260120E+04, real bh7 = 4.92229457E+00, real bl1 = 3.16826710E+00, real bl2 = -3.27931884E-03, real bl3 = 6.64306396E-06;
+			real bl4 = -6.12806624E-09, real bl5 = 2.11265971E-12, real bl6 = 2.91222592E+04, real bl7 = 2.05193346E+00, real bl8 = 2.99687009E+04;
+			real b_tempmid = 1000.0;
+			real bH = h_calc(temp, b_tempmid, bh1, bh2, bh3, bh4, bh5, bh6, bh7, bl1, bl2, bl3, bl4, bl5, bl6, bl7);
+			real bS = s_calc(temp, b_tempmid, bh1, bh2, bh3, bh4, bh5, bh6, bh7, bl1, bl2, bl3, bl4, bl5, bl6, bl7);
 
-		real ch1 = 2.10591364E+01, real ch2 = 2.82563070E-02, real ch3 = -1.03328686E-05, real ch4 = 1.68867034E-09, real ch5 = -1.01974767E-13;
-		real ch6 = 4.09143507E+03, real ch7 = -8.84963398E+01, real cl1 = -1.15176448E+00, real cl2 = 6.11354512E-02, real cl3 = 3.20151083E-05; 
-		real cl4 = -9.94285290E-08, real cl5 = 4.79990043E-11, real cl6 = 1.14058756E+04, real cl7 = 3.25584836E+01, real cl8 = 1.38887800E+04;
-		real c_tempmid = 1000.0;
-		real cH = h_calc(temp, c_tempmid, ch1, ch2, ch3, ch4, ch5, ch6, ch7, cl1, cl2, cl3, cl4, cl5, cl6, cl7);
-		real cS = s_calc(temp, c_tempmid, ch1, ch2, ch3, ch4, ch5, ch6, ch7, cl1, cl2, cl3, cl4, cl5, cl6, cl7);
+			real ch1 = 2.10591364E+01, real ch2 = 2.82563070E-02, real ch3 = -1.03328686E-05, real ch4 = 1.68867034E-09, real ch5 = -1.01974767E-13;
+			real ch6 = 4.09143507E+03, real ch7 = -8.84963398E+01, real cl1 = -1.15176448E+00, real cl2 = 6.11354512E-02, real cl3 = 3.20151083E-05; 
+			real cl4 = -9.94285290E-08, real cl5 = 4.79990043E-11, real cl6 = 1.14058756E+04, real cl7 = 3.25584836E+01, real cl8 = 1.38887800E+04;
+			real c_tempmid = 1000.0;
+			real cH = h_calc(temp, c_tempmid, ch1, ch2, ch3, ch4, ch5, ch6, ch7, cl1, cl2, cl3, cl4, cl5, cl6, cl7);
+			real cS = s_calc(temp, c_tempmid, ch1, ch2, ch3, ch4, ch5, ch6, ch7, cl1, cl2, cl3, cl4, cl5, cl6, cl7);
 
-		real dh1 = 2.83853033E+00, real dh2 = 1.10741289E-03, real dh3 = -2.94000209E-07, real dh4 = 4.20698729E-11, real dh5 = -2.42289890E-15;
- 		real dh6 = 3.69780808E+03, real dh7 = 5.84494652E+00, real dl1 = 3.99198424E+00, real dl2 = -2.40106655E-03, real dl3 = 4.61664033E-06;
-		real dl4 = -3.87916306E-09, real dl5 = 1.36319502E-12, real dl6 = 3.36889836E+03, real dl7 = -1.03998477E-01, real dl8 = 4.48615380E+03;
-		real d_tempmid = 1000.0;
-		real dH = h_calc(temp, d_tempmid, dh1, dh2, dh3, dh4, dh5, dh6, dh7, dl1, dl2, dl3, dl4, dl5, dl6, dl7);
-		real dS = s_calc(temp, d_tempmid, dh1, dh2, dh3, dh4, dh5, dh6, dh7, dl1, dl2, dl3, dl4, dl5, dl6, dl7);
+			real dh1 = 2.83853033E+00, real dh2 = 1.10741289E-03, real dh3 = -2.94000209E-07, real dh4 = 4.20698729E-11, real dh5 = -2.42289890E-15;
+	 		real dh6 = 3.69780808E+03, real dh7 = 5.84494652E+00, real dl1 = 3.99198424E+00, real dl2 = -2.40106655E-03, real dl3 = 4.61664033E-06;
+			real dl4 = -3.87916306E-09, real dl5 = 1.36319502E-12, real dl6 = 3.36889836E+03, real dl7 = -1.03998477E-01, real dl8 = 4.48615380E+03;
+			real d_tempmid = 1000.0;
+			real dH = h_calc(temp, d_tempmid, dh1, dh2, dh3, dh4, dh5, dh6, dh7, dl1, dl2, dl3, dl4, dl5, dl6, dl7);
+			real dS = s_calc(temp, d_tempmid, dh1, dh2, dh3, dh4, dh5, dh6, dh7, dl1, dl2, dl3, dl4, dl5, dl6, dl7);
 
-		gibbs = dH + cH - (aH + bH) - temp * (dS + cS - (aS + bS));
-		break;
+			gibbs = dH + cH - (aH + bH) - temp * (dS + cS - (aS + bS));
+			break;
+		}
 
 		case 11: /* CZ* + H <=> CZH  
 				    a  + b <=>  c    */
-		real ah1 = 3.29950506E+00, real ah2 = 6.30133365E-02, real ah3 = -3.79760083E-05, real ah4 = 1.08180756E-08, real ah5 = -1.18007697E-12;
-		real ah6 = 4.47516414E+04, real ah7 = 5.41223132E+00, real al1 = -8.00768796E+00, real al2 = 1.03041289E-01, real al3 = -8.38190998E-05;
-		real al4 = 2.76491726E-08, real al5 = -8.88842209E-13, real al6 = 4.70598674E+04, real al7 = 6.07299723E+01, real al8 = 2.10265738E+04;
-		real a_tempmid = 1000;
-		real aH = h_calc(temp, a_tempmid, ah1, ah2, ah3, ah4, ah5, ah6, ah7, al1, al2, al3, al4, al5, al6, al7);
-		real aS = s_calc(temp, a_tempmid, ah1, ah2, ah3, ah4, ah5, ah6, ah7, al1, al2, al3, al4, al5, al6, al7);
+		{
+			real ah1 = 3.29950506E+00, real ah2 = 6.30133365E-02, real ah3 = -3.79760083E-05, real ah4 = 1.08180756E-08, real ah5 = -1.18007697E-12;
+			real ah6 = 4.47516414E+04, real ah7 = 5.41223132E+00, real al1 = -8.00768796E+00, real al2 = 1.03041289E-01, real al3 = -8.38190998E-05;
+			real al4 = 2.76491726E-08, real al5 = -8.88842209E-13, real al6 = 4.70598674E+04, real al7 = 6.07299723E+01, real al8 = 2.10265738E+04;
+			real a_tempmid = 1000;
+			real aH = h_calc(temp, a_tempmid, ah1, ah2, ah3, ah4, ah5, ah6, ah7, al1, al2, al3, al4, al5, al6, al7);
+			real aS = s_calc(temp, a_tempmid, ah1, ah2, ah3, ah4, ah5, ah6, ah7, al1, al2, al3, al4, al5, al6, al7);
 
-		real bh1 = 0.25000000E+01, real bh2 = 0.00000000E+00, real bh3 = 0.00000000E+00, real bh4 = 0.00000000E+00, real bh5 = 0.00000000E+00;
- 		real bh6 = 0.25473660E+05, real bh7 = -0.44668285E+00, real bl1 = 0.25000000E+01, real bl2 = 0.00000000E+00, real bl3 = 0.00000000E+00;
- 		real bl4 = 0.00000000E+00, real bl5 = 0.00000000E+00, real bl6 = 0.25473660E+05, real bl7 = -0.44668285E+00, real bl8 = 0.26219035E+05;
- 		real b_tempmid = 1000;
- 		real bH = h_calc(temp, b_tempmid, bh1, bh2, bh3, bh4, bh5, bh6, bh7, bl1, bl2, bl3, bl4, bl5, bl6, bl7);
-		real bS = s_calc(temp, b_tempmid, bh1, bh2, bh3, bh4, bh5, bh6, bh7, bl1, bl2, bl3, bl4, bl5, bl6, bl7);
+			real bh1 = 0.25000000E+01, real bh2 = 0.00000000E+00, real bh3 = 0.00000000E+00, real bh4 = 0.00000000E+00, real bh5 = 0.00000000E+00;
+	 		real bh6 = 0.25473660E+05, real bh7 = -0.44668285E+00, real bl1 = 0.25000000E+01, real bl2 = 0.00000000E+00, real bl3 = 0.00000000E+00;
+	 		real bl4 = 0.00000000E+00, real bl5 = 0.00000000E+00, real bl6 = 0.25473660E+05, real bl7 = -0.44668285E+00, real bl8 = 0.26219035E+05;
+	 		real b_tempmid = 1000;
+	 		real bH = h_calc(temp, b_tempmid, bh1, bh2, bh3, bh4, bh5, bh6, bh7, bl1, bl2, bl3, bl4, bl5, bl6, bl7);
+			real bS = s_calc(temp, b_tempmid, bh1, bh2, bh3, bh4, bh5, bh6, bh7, bl1, bl2, bl3, bl4, bl5, bl6, bl7);
 
- 		real ch1 = 1.76826275E+00, real ch2 = 6.89143506E-02, real ch3 = -4.14322176E-05, real ch4 = 1.17914309E-08, real ch5 = -1.28597061E-12;
-		real ch6 = 1.45412795E+04, real ch7 = 1.06257927E+01, real cl1 = -8.72434585E+00, real cl2 =  1.05376008E-01, real cl3 = -8.01710690E-05;
-		real cl4 = 2.18545974E-08, real cl5 =  1.42066606E-12, real cl6 =  1.66588912E+04, real cl7 = 6.19828860E+01, real cl8 = 2.10522087E+04;
-		real c_tempmid = 1000;
-		real cH = h_calc(temp, c_tempmid, ch1, ch2, ch3, ch4, ch5, ch6, ch7, cl1, cl2, cl3, cl4, cl5, cl6, cl7);
-		real cS = s_calc(temp, c_tempmid, ch1, ch2, ch3, ch4, ch5, ch6, ch7, cl1, cl2, cl3, cl4, cl5, cl6, cl7);
+	 		real ch1 = 1.76826275E+00, real ch2 = 6.89143506E-02, real ch3 = -4.14322176E-05, real ch4 = 1.17914309E-08, real ch5 = -1.28597061E-12;
+			real ch6 = 1.45412795E+04, real ch7 = 1.06257927E+01, real cl1 = -8.72434585E+00, real cl2 =  1.05376008E-01, real cl3 = -8.01710690E-05;
+			real cl4 = 2.18545974E-08, real cl5 =  1.42066606E-12, real cl6 =  1.66588912E+04, real cl7 = 6.19828860E+01, real cl8 = 2.10522087E+04;
+			real c_tempmid = 1000;
+			real cH = h_calc(temp, c_tempmid, ch1, ch2, ch3, ch4, ch5, ch6, ch7, cl1, cl2, cl3, cl4, cl5, cl6, cl7);
+			real cS = s_calc(temp, c_tempmid, ch1, ch2, ch3, ch4, ch5, ch6, ch7, cl1, cl2, cl3, cl4, cl5, cl6, cl7);
 
-		gibbs = cH - (bH + aH) - temp * (cS - (bS + aS));
-		break;
+			gibbs = cH - (bH + aH) - temp * (cS - (bS + aS));
+			break;
+		}
 	}
 
 	return gibbs;
