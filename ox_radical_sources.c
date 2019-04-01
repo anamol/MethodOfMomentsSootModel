@@ -60,12 +60,12 @@ DEFINE_SOURCE(CAH,c,t,dS,eqn)
 	real cellTemp = C_T(c,t);
 	real cellRho = C_R(c,t) * 1e-3; /* in g/cc */
 
-	real CAHMc = UDSI(c,t,3) * C_R(c,t) * 1e-6;
-	real CAradMc = UDSI(c,t,4) * C_R(c,t) * 1e-6;
-	real CAOMc = UDSI(c,t,5) * C_R(c,t) * 1e-6;
-	real CR5Mc = UDSI(c,t,6) * C_R(c,t) * 1e-6;
-	real CZHMc = UDSI(c,t,7) * C_R(c,t) * 1e-6;
-	real CZradMc = UDSI(c,t,8) * C_R(c,t) * 1e-6;
+	real CAHMc = C_UDSI(c,t,3) * C_R(c,t) * 1e-6;
+	real CAradMc = C_UDSI(c,t,4) * C_R(c,t) * 1e-6;
+	real CAOMc = C_UDSI(c,t,5) * C_R(c,t) * 1e-6;
+	real CR5Mc = C_UDSI(c,t,6) * C_R(c,t) * 1e-6;
+	real CZHMc = C_UDSI(c,t,7) * C_R(c,t) * 1e-6;
+	real CZradMc = C_UDSI(c,t,8) * C_R(c,t) * 1e-6;
 
 	Material *mat1 = THREAD_MATERIAL(t);
 
@@ -143,12 +143,12 @@ DEFINE_SOURCE(CArad,c,t,dS,eqn)
 	real cellTemp = C_T(c,t);
 	real cellRho = C_R(c,t) * 1e-3; /* in g/cc */
 
-	real CAHMc = UDSI(c,t,3) * C_R(c,t) * 1e-6;
-	real CAradMc = UDSI(c,t,4) * C_R(c,t) * 1e-6;
-	real CAOMc = UDSI(c,t,5) * C_R(c,t) * 1e-6;
-	real CR5Mc = UDSI(c,t,6) * C_R(c,t) * 1e-6;
-	real CZHMc = UDSI(c,t,7) * C_R(c,t) * 1e-6;
-	real CZradMc = UDSI(c,t,8) * C_R(c,t) * 1e-6;
+	real CAHMc = C_UDSI(c,t,3) * C_R(c,t) * 1e-6;
+	real CAradMc = C_UDSI(c,t,4) * C_R(c,t) * 1e-6;
+	real CAOMc = C_UDSI(c,t,5) * C_R(c,t) * 1e-6;
+	real CR5Mc = C_UDSI(c,t,6) * C_R(c,t) * 1e-6;
+	real CZHMc = C_UDSI(c,t,7) * C_R(c,t) * 1e-6;
+	real CZradMc = C_UDSI(c,t,8) * C_R(c,t) * 1e-6;
 
 	Material *mat1 = THREAD_MATERIAL(t);
 
@@ -203,12 +203,12 @@ DEFINE_SOURCE(CAO,c,t,dS,eqn)
 	real cellTemp = C_T(c,t);
 	real cellRho = C_R(c,t) * 1e-3; /* in g/cc */
 
-	real CAHMc = UDSI(c,t,3) * C_R(c,t) * 1e-6;
-	real CAradMc = UDSI(c,t,4) * C_R(c,t) * 1e-6;
-	real CAOMc = UDSI(c,t,5) * C_R(c,t) * 1e-6;
-	real CR5Mc = UDSI(c,t,6) * C_R(c,t) * 1e-6;
-	real CZHMc = UDSI(c,t,7) * C_R(c,t) * 1e-6;
-	real CZradMc = UDSI(c,t,8) * C_R(c,t) * 1e-6;
+	real CAHMc = C_UDSI(c,t,3) * C_R(c,t) * 1e-6;
+	real CAradMc = C_UDSI(c,t,4) * C_R(c,t) * 1e-6;
+	real CAOMc = C_UDSI(c,t,5) * C_R(c,t) * 1e-6;
+	real CR5Mc = C_UDSI(c,t,6) * C_R(c,t) * 1e-6;
+	real CZHMc = C_UDSI(c,t,7) * C_R(c,t) * 1e-6;
+	real CZradMc = C_UDSI(c,t,8) * C_R(c,t) * 1e-6;
 
 	Material *mat1 = THREAD_MATERIAL(t);
 
@@ -245,12 +245,12 @@ DEFINE_SOURCE(CR5,c,t,dS,eqn)
 	real cellTemp = C_T(c,t);
 	real cellRho = C_R(c,t) * 1e-6; /* in g/cc */
 
-	real CAHMc = UDSI(c,t,3) * C_R(c,t) * 1e-6;
-	real CAradMc = UDSI(c,t,4) * C_R(c,t) * 1e-6;
-	real CAOMc = UDSI(c,t,5) * C_R(c,t) * 1e-6;
-	real CR5Mc = UDSI(c,t,6) * C_R(c,t) * 1e-6;
-	real CZHMc = UDSI(c,t,7) * C_R(c,t) * 1e-6;
-	real CZradMc = UDSI(c,t,8) * C_R(c,t) * 1e-6;
+	real CAHMc = C_UDSI(c,t,3) * C_R(c,t) * 1e-6;
+	real CAradMc = C_UDSI(c,t,4) * C_R(c,t) * 1e-6;
+	real CAOMc = C_UDSI(c,t,5) * C_R(c,t) * 1e-6;
+	real CR5Mc = C_UDSI(c,t,6) * C_R(c,t) * 1e-6;
+	real CZHMc = C_UDSI(c,t,7) * C_R(c,t) * 1e-6;
+	real CZradMc = C_UDSI(c,t,8) * C_R(c,t) * 1e-6;
 
 	Material *mat1 = THREAD_MATERIAL(t);
 
@@ -282,12 +282,12 @@ DEFINE_SOURCE(CZH,c,t,dS,eqn)
 	real cellTemp = C_T(c,t);
 	real cellRho = C_R(c,t) * 1e-6; /* in g/cc */
 
-	real CAHMc = UDSI(c,t,3) * C_R(c,t) * 1e-6;
-	real CAradMc = UDSI(c,t,4) * C_R(c,t) * 1e-6;
-	real CAOMc = UDSI(c,t,5) * C_R(c,t) * 1e-6;
-	real CR5Mc = UDSI(c,t,6) * C_R(c,t) * 1e-6;
-	real CZHMc = UDSI(c,t,7) * C_R(c,t) * 1e-6;
-	real CZradMc = UDSI(c,t,8) * C_R(c,t) * 1e-6;
+	real CAHMc = C_UDSI(c,t,3) * C_R(c,t) * 1e-6;
+	real CAradMc = C_UDSI(c,t,4) * C_R(c,t) * 1e-6;
+	real CAOMc = C_UDSI(c,t,5) * C_R(c,t) * 1e-6;
+	real CR5Mc = C_UDSI(c,t,6) * C_R(c,t) * 1e-6;
+	real CZHMc = C_UDSI(c,t,7) * C_R(c,t) * 1e-6;
+	real CZradMc = C_UDSI(c,t,8) * C_R(c,t) * 1e-6;
 
 	Material *mat1 = THREAD_MATERIAL(t);
 
@@ -348,12 +348,12 @@ DEFINE_SOURCE(CZrad,c,t,dS,eqn)
 	real cellTemp = C_T(c,t);
 	real cellRho = C_R(c,t) * 1e-6; /* in g/cc */
 
-	real CAHMc = UDSI(c,t,3) * C_R(c,t) * 1e-6;
-	real CAradMc = UDSI(c,t,4) * C_R(c,t) * 1e-6;
-	real CAOMc = UDSI(c,t,5) * C_R(c,t) * 1e-6;
-	real CR5Mc = UDSI(c,t,6) * C_R(c,t) * 1e-6;
-	real CZHMc = UDSI(c,t,7) * C_R(c,t) * 1e-6;
-	real CZradMc = UDSI(c,t,8) * C_R(c,t) * 1e-6;
+	real CAHMc = C_UDSI(c,t,3) * C_R(c,t) * 1e-6;
+	real CAradMc = C_UDSI(c,t,4) * C_R(c,t) * 1e-6;
+	real CAOMc = C_UDSI(c,t,5) * C_R(c,t) * 1e-6;
+	real CR5Mc = C_UDSI(c,t,6) * C_R(c,t) * 1e-6;
+	real CZHMc = C_UDSI(c,t,7) * C_R(c,t) * 1e-6;
+	real CZradMc = C_UDSI(c,t,8) * C_R(c,t) * 1e-6;
 
 	Material *mat1 = THREAD_MATERIAL(t);
 
@@ -401,12 +401,12 @@ DEFINE_EXECUTE_AT_END(add_source_terms)
 			C_UDMI(c,t,52) = C_UDMI(c,t,2) + C_UDMI(c,t,4) + C_UDMI(c,t,10) + C_UDMI(c,t,18) + C_UDMI(c,t,45);
 			/*					nuc 	+		c2h2		+	oxid 		+	coag		+	thermoph 	*/	
 
-			real CAHMc = UDSI(c,t,3) * C_R(c,t) * 1e-6;
-			real CAradMc = UDSI(c,t,4) * C_R(c,t) * 1e-6;
-			real CAOMc = UDSI(c,t,5) * C_R(c,t) * 1e-6;
-			real CR5Mc = UDSI(c,t,6) * C_R(c,t) * 1e-6;
-			real CZHMc = UDSI(c,t,7) * C_R(c,t) * 1e-6;
-			real CZradMc = UDSI(c,t,8) * C_R(c,t) * 1e-6;
+			real CAHMc = C_UDSI(c,t,3) * C_R(c,t) * 1e-6;
+			real CAradMc = C_UDSI(c,t,4) * C_R(c,t) * 1e-6;
+			real CAOMc = C_UDSI(c,t,5) * C_R(c,t) * 1e-6;
+			real CR5Mc = C_UDSI(c,t,6) * C_R(c,t) * 1e-6;
+			real CZHMc = C_UDSI(c,t,7) * C_R(c,t) * 1e-6;
+			real CZradMc = C_UDSI(c,t,8) * C_R(c,t) * 1e-6;
 
 			real M0 = C_UDSI(c,t,0) * C_R(c,t) / 1e6;   /* Conv				*/
     		real M1 = C_UDSI(c,t,1) * C_R(c,t) / 1e6;	/*     to 			*/
