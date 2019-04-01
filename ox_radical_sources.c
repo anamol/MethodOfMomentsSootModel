@@ -387,8 +387,9 @@ DEFINE_EXECUTE_AT_END(add_source_terms)
 {
 	Domain *d;
 	Thread *t;
-
 	cell_t c;
+
+	d = Get_Domain(1);
 
 	thread_loop_c(t,d)
 	{
