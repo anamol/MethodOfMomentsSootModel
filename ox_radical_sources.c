@@ -422,6 +422,7 @@ DEFINE_EXECUTE_AT_END(add_source_terms)
 			real alpha = (A + Z)/chi_nominal;
 			C_UDMI(c,t,53) = alpha;
 		}
+		end_c_loop(c,t)
 	}
 }
 
