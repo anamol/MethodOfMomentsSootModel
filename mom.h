@@ -17,6 +17,7 @@
 #define H2MW 2.01 
 #define HMW 1.007 
 #define O2MW 32 
+#define OMW 16
 #define OHMW 13 
 #define H2OMW 16 
 #define pyrMW 202.25 
