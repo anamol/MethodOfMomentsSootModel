@@ -55,6 +55,13 @@ real s_calc(real temp, real tempmid, real ah1, real ah2, real ah3, real ah4, rea
 
 real gibbs_calc(int rxn, real temp);
 
+DEFINE_SOURCE(CAHnuc,c,t,dS,eqn)
+{
+	real nuc_term = C_UDMI(c,t,0) * 1e-6 * alpha_o * (2 * NPyr)/(avogad * 1e-3);
+	dS[eqn] = 0.0;
+	return nuc_term;
+}
+
 DEFINE_SOURCE(CAH,c,t,dS,eqn)
 {
 	real cellTemp = C_T(c,t);
@@ -128,13 +135,9 @@ DEFINE_SOURCE(CAH,c,t,dS,eqn)
 		- k7f * CAHMc + k7r * CAOMc + 2 * (k8 * CR5Mc + 1/2 * (k4 * CAOMc + k6 * CAradMc + k8 * CR5Mc)) 
 		- 2 * pow(alpha, 2) *  chi_nominal * Mtwothirds_dot / Mtwothirds;
 
-	real nuc_term = C_UDMI(c,t,0) * 1e-6 * alpha_o * (2 * NPyr);
+	dS[eqn] = -k1f - k2r - k5f - k7f;
 
-	real source = source_reac + nuc_term;
-
-	dS[eqn] = -k1f - k2r - k5f - k7f ;
-
-	return source;
+	return source_reac;
 
 }
 
@@ -275,6 +278,12 @@ DEFINE_SOURCE(CR5,c,t,dS,eqn)
 	dS[eqn] = - k8 - 1/2 * k8;
 
 	return source_reac;
+}
+
+DEFINE_SOURCE(CZHnuc,c,t,dS,eqn)
+{
+	real nuc_term = C_UDMI(c,t,0) * 1e-6 * (1 - 2 * alpha_o) * (2 * NPyr)/(avogad * 1e-3);
+	return nuc_term; 
 }
 
 DEFINE_SOURCE(CZH,c,t,dS,eqn)
