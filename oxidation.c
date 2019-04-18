@@ -49,6 +49,46 @@ DEFINE_SOURCE(m_1_OxSource,c,t,dS,eqn)
     return source*fudgeFac1;
 }
 
+DEFINE_SOURCE(m_1_FrenklachNew,c,t,dS,eqn):
+{
+    real cellTemp = C_T(c,t);
+    real cellRho = C_R(c,t);
+
+    real cellM0 = cellRho*C_UDSI(c,t,0);
+    real cellM1 = cellRho*C_UDSI(c,t,1);
+    real cellM2 = cellRho*C_UDSI(c,t,2);
+
+    real CAHMc = C_UDSI(c,t,3) * C_R(c,t) * 1e-3;
+    real CAradMc = C_UDSI(c,t,4) * C_R(c,t) * 1e-3;
+    real CAOMc = C_UDSI(c,t,5) * C_R(c,t) * 1e-3;
+    real CR5Mc = C_UDSI(c,t,6) * C_R(c,t) * 1e-3;
+    real CZHMc = C_UDSI(c,t,7) * C_R(c,t) * 1e-3;
+    real CZradMc = C_UDSI(c,t,8) * C_R(c,t) * 1e-3;
+
+    real M0 = C_UDSI(c,t,0) * C_R(c,t) / 1e6;   /* Conv             */
+    real M1 = C_UDSI(c,t,1) * C_R(c,t) / 1e6;   /*     to           */
+    real M2 = C_UDSI(c,t,2) * C_R(c,t) / 1e6;   /*       /cm^3      */
+    real Mtwothirds = fractionalMoments(twoThird, M0, M1, M2) * M0;
+
+
+    real k4 = S4A * pow(cellTemp, S4n) * exp(-S4Ea/cellTemp);
+    real k6 = S6A * OHMc;
+    real k8 = S8A * pow(cellTemp, S8n) * exp(-S8Ea/cellTemp) * OMc;
+
+    real rs4 = k4 * CAOMc;
+    real rs6 = k6 * CAradMc;
+    real rs8 = k8 * CR5Mc;
+    real rs9 = 0.5 * (rs4 + rs6 + rs8);
+
+    real r_oxid = 12 * (rs4 + rs6 + rs8 + 2*rs9);
+    real km = r_oxid/Mtwothirds;
+
+    real source = - km * Mtwothirds;
+
+    return source;
+
+}
+
 DEFINE_SOURCE(pdf_m_1_OxSource,c,t,dS,eqn)
 {
     real sourceOH = 0.0;

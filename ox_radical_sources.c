@@ -57,7 +57,7 @@ real gibbs_calc(int rxn, real temp);
 
 DEFINE_SOURCE(CAHnuc,c,t,dS,eqn)
 {
-	real nuc_term = C_UDMI(c,t,0) * 1e-6 * alpha_o * (2 * NPyr)/(avogad * 1e-3);
+	real nuc_term = C_UDMI(c,t,0) * C_R(c,t) * 1e-6 * alpha_o * (2 * NPyr)/(avogad * 1e-3);
 	dS[eqn] = 0.0;
 	return nuc_term;
 }
@@ -282,7 +282,8 @@ DEFINE_SOURCE(CR5,c,t,dS,eqn)
 
 DEFINE_SOURCE(CZHnuc,c,t,dS,eqn)
 {
-	real nuc_term = C_UDMI(c,t,0) * 1e-6 * (1 - 2 * alpha_o) * (2 * NPyr)/(avogad * 1e-3);
+	real nuc_term = C_UDMI(c,t,0) * C_R(c,t) * 1e-6 * (1 - 2 * alpha_o) * (2 * NPyr)/(avogad * 1e-3);
+	dS[eqn] = 0.0;
 	return nuc_term; 
 }
 
