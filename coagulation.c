@@ -57,7 +57,7 @@ DEFINE_SOURCE (m_0_CoagSource,c,t,dS,eqn)
     real Gc = -Kc*(1 + muOneThird*muMinusOneThird + KcPrime*(muMinusOneThird + muOneThird*muMinusTwoThird))*pow(cellM0,2)*normParameter;
     real Gf = -0.5*Kf*pow(cellM0,2)*f_oneHalf_0_0*normParameter;
 
-    GfDiff = CoagDiffM0(cellM0,cellM1,cellM2, Kf) * normParameter;
+    real GfDiff = CoagDiffM0(cellM0,cellM1,cellM2, Kf) * normParameter;
 
     
     C_UDMI(c,t,13) = Gc;
@@ -131,7 +131,7 @@ DEFINE_SOURCE (m_0_CoagSource_Gf,c,t,dS,eqn)
 
     real Gf = -0.5*Kf*pow(cellM0,2)*f_oneHalf_0_0*normParameter;
 
-    GfDiff = CoagDiffM0(cellM0,cellM1,cellM2, Kf) * normParameter;
+    real GfDiff = CoagDiffM0(cellM0,cellM1,cellM2, Kf) * normParameter;
 
     
     C_UDMI(c,t,14) = Gf;

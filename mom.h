@@ -98,5 +98,7 @@ real fracMomFirstDiffM0(real p, real m0, real m1, real m2);
 real fracMomFirstDiffM1(real p, real m0, real m1, real m2);
 real fracMomFirstDiffM2(real p, real m0, real m1, real m2);
 real GcDiffM2Calc(r, Kc, KcPrime, cellM0, cellM1, cellM2);
+real CoagDiffM0(real m0,real m1,real m2,real Kf);
+real CoagDiffM2(real m0,real m1,real m2,real Kf);
 
 #endif
