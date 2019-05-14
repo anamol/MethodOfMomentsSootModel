@@ -138,6 +138,7 @@ DEFINE_SOURCE(first_bin_growth,c,t,dS,eqn)
     real alpha = tanh(a/log10(cellM1/cellM0)+b); 
     if (alpha < 0 ) { alpha = 0.01; }
 
+    real chiSoot = chiSootCalc(c, t, cellTemp, cellRho);
     
     real k4 = A4*pow(cellTemp, n4)*exp(-Ea4/(R*cellTemp)) * C2H2Mc;
 
